@@ -54,7 +54,6 @@ class CRM_Mobilise_StateMachine_Mobilise extends CRM_Core_StateMachine {
       'CRM_Mobilise_Form_Type'    => NULL,
       'CRM_Mobilise_Form_Event'   => NULL,
       'CRM_Mobilise_Form_Alumni'  => NULL,
-      'CRM_Mobilise_Form_Done'    => NULL,
     );
     $this->addSequentialPages($this->_pages, $action);
   }

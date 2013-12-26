@@ -44,6 +44,8 @@ class CRM_Mobilise_Controller_Mobilise extends CRM_Core_Controller {
 
     // create and instantiate the pages
     $this->addPages($this->_stateMachine, $action);
+
+    $this->addActions();
   }
 }
 

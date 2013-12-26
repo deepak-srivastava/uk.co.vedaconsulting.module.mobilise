@@ -26,5 +26,9 @@
 <div class="crm-block crm-form-block crm-mailing-group-form-block">
 {include file="CRM/common/WizardHeader.tpl"}
 
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
+  <table class="form-layout">
+    <tr class="crm-mobilise-group-type-block-type"><td class="label">{$form.event_id.label}</td><td>{$form.event_id.html}</td></tr>
+  </table>
+
+<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
 </div>

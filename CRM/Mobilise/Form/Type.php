@@ -56,6 +56,9 @@ class CRM_Mobilise_Form_Type extends CRM_Core_Form {
    * @access public
    */
   public function buildQuickForm() {
+    $this->add('select', 'mobilise_type', ts('Mobilisation'), 
+	       array('' => '- Mobilisation Type -', 'event' => 'Event', 'activity' => 'Activity'), TRUE);
+    
     $buttons = array(
       array('type' => 'next',
         'name' => ts('Next >>'),

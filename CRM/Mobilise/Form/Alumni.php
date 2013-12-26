@@ -56,9 +56,27 @@ class CRM_Mobilise_Form_Alumni extends CRM_Core_Form {
    * @access public
    */
   public function buildQuickForm() {
+    $roleTypes = array();
+    $roleids   = CRM_Event_PseudoConstant::participantRole();
+    foreach ($roleids as $rolekey => $rolevalue) {
+      $roleTypes[] = $this->createElement('checkbox', $rolekey, NULL, $rolevalue,
+        array('onclick' => "showCustomData( 'Participant', {$rolekey}, {$this->_roleCustomDataTypeID} );")
+      );
+    }
+    $this->addGroup($roleTypes, 'role_id', ts('Participant Role'));
+    $this->addRule('role_id', ts('Role is required'), 'required');
+
+    $this->addDateTime('register_date', ts('Registration Date'), TRUE, array('formatType' => 'activityDateTime'));
+
+    $status = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
+    $this->add('select', 'status_id', ts('Participant Status'), 
+      array('' => ts('- select -')) + $status, TRUE);
+
+    $this->add('text', 'source', ts('Event Source'));
+
     $buttons = array(
       array('type' => 'next',
-        'name' => ts('Next >>'),
+        'name' => ts('Save and Done'),
         'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
         'isDefault' => TRUE,
       ),

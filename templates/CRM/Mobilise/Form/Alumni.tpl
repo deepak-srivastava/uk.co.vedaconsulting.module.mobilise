@@ -23,8 +23,50 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div class="crm-block crm-form-block crm-mailing-group-form-block">
+<div class="crm-block crm-form-block crm-mobilise-group-alumni-block">
 {include file="CRM/common/WizardHeader.tpl"}
 
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
+
+  <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-open">
+    <div class="crm-accordion-header">
+      <div class="icon crm-accordion-pointer"></div> 
+      {ts}Participant Fields{/ts}
+    </div><!-- /.crm-accordion-header -->
+    <div class="crm-accordion-body">
+
+      <table class="form-layout-compressed">
+	<tr class="crm-mobilise-group-alumni-block-role_id"><td class="label">{$form.role_id.label}</td><td>{$form.role_id.html}</td></tr>
+	<tr class="crm-mobilise-group-alumni-block-register_date">
+	  <td class="label">{$form.register_date.label}</td>
+	  <td>
+	    {if $hideCalendar neq true}
+	      {include file="CRM/common/jcalendar.tpl" elementName=register_date}
+	    {else}
+	      {$form.register_date.html|crmDate}
+	    {/if}
+	  </td>
+	</tr>
+	<tr class="crm-mobilise-group-alumni-block-status_id">
+	  <td class="label">{$form.status_id.label}</td><td>{$form.status_id.html}</td>
+	</tr>
+	<tr class="crm-mobilise-group-alumni-block-source">
+	  <td class="label">{$form.source.label}</td><td>{$form.source.html|crmReplace:class:huge}<br />
+	    <span class="description">{ts}Source for this registration (if applicable).{/ts}</span></td>
+	</tr>
+      </table>
+
+    </div><!-- /.crm-accordion-body -->
+  </div><!-- /.crm-accordion-wrapper -->
+
+  <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-open">
+    <div class="crm-accordion-header">
+      <div class="icon crm-accordion-pointer"></div> 
+      {ts}Selected Contacts{/ts}
+    </div><!-- /.crm-accordion-header -->
+    <div class="crm-accordion-body">
+      
+    </div><!-- /.crm-accordion-body -->
+  </div><!-- /.crm-accordion-wrapper -->
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
 </div>

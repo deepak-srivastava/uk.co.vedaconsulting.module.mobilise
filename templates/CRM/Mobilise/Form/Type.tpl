@@ -26,5 +26,9 @@
 <div class="crm-block crm-form-block crm-mobilise-group-type-block">
   {include file="CRM/common/WizardHeader.tpl"}
 
+  <table class="form-layout">
+    <tr class="crm-mobilise-group-type-block-type"><td class="label">{$form.mobilise_type.label}</td><td>{$form.mobilise_type.html}</td></tr>
+  </table>
+  
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
 </div>

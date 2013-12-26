@@ -56,6 +56,9 @@ class CRM_Mobilise_Form_Event extends CRM_Core_Form {
    * @access public
    */
   public function buildQuickForm() {
+    $events = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
+    $this->add('select', 'event_id', ts('Select Event'), $events, TRUE);
+
     $buttons = array(
       array('type' => 'next',
         'name' => ts('Next >>'),
