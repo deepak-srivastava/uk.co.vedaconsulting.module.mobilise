@@ -46,7 +46,16 @@ class CRM_Mobilise_Form_Type extends CRM_Core_Form {
    * @access public
    */
   public function preProcess() {
-    parent::preProcess();
+    $cids = CRM_Utils_Array::value('cids', $_REQUEST);
+    if (empty($cids)) {
+      $cids = $this->get('cids');
+    } else {
+      $this->set('cids', $cids);
+    }
+
+    if (empty($cids)) {
+      CRM_Core_Error::fatal(ts("Could not find valid contact ids"));
+    }
   }
 
   /**

@@ -89,7 +89,24 @@ class CRM_Mobilise_Form_Alumni extends CRM_Core_Form {
   }
 
   public function postProcess() {
+    require_once 'api/api.php';
     $values = $this->controller->exportValues($this->_name);
+
+    foreach ($this->get('cids') as $cid) {
+      if (CRM_Utils_Type::validate($cid, 'Integer')) {
+        $params = 
+          array( 
+            'contact_id'  => $cid,
+            'event_id'    => $this->get('event_id'),
+            'status_id'   => $values['status_id'],
+            'role_id'     => implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys($values['role_id'])),
+            'register_date' => CRM_Utils_Date::processDate($values['register_date'], $values['register_date_time']),
+            'source'        => $values['source'],
+            'version'       => 3,
+          );
+        $result = civicrm_api( 'participant','create',$params );
+      }
+    }
   }
 
   /**

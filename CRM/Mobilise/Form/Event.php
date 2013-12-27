@@ -75,6 +75,7 @@ class CRM_Mobilise_Form_Event extends CRM_Core_Form {
 
   public function postProcess() {
     $values = $this->controller->exportValues($this->_name);
+    $this->set('event_id', $values['event_id']);
   }
 
   /**
