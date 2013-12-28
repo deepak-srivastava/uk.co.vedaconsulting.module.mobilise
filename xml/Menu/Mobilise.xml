@@ -4,6 +4,6 @@
     <path>civicrm/mobilise</path>
     <title>Mobilise</title>
     <page_callback>CRM_Mobilise_Controller_Mobilise</page_callback>
-    <access_arguments>administer CiviCRM</access_arguments>
+    <access_arguments>access CiviCRM</access_arguments>
   </item>
 </menu>

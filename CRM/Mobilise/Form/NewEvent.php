@@ -37,7 +37,7 @@
  * 
  *
  */
-class CRM_Mobilise_Form_Alumni extends CRM_Core_Form {
+class CRM_Mobilise_Form_NewEvent extends CRM_Core_Form {
 
   /**
    * Function to set variables up before form is built
@@ -50,17 +50,20 @@ class CRM_Mobilise_Form_Alumni extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form in edit/view mode
+   * This function sets the default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
    *
    * @return None
    */
-  public function setDefaultValues() {
+  function setDefaultValues() {
     $defaults = array();
-    
-    list($defaults['register_date'], $defaults['register_date_time']) = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
+
+    list($defaults['start_date'], 
+      $defaults['start_date_time']) = 
+      CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
+    $defaults['is_active'] = 1;
 
     return $defaults;
   }
@@ -72,27 +75,24 @@ class CRM_Mobilise_Form_Alumni extends CRM_Core_Form {
    * @access public
    */
   public function buildQuickForm() {
-    $roleTypes = array();
-    $roleids   = CRM_Event_PseudoConstant::participantRole();
-    foreach ($roleids as $rolekey => $rolevalue) {
-      $roleTypes[] = $this->createElement('checkbox', $rolekey, NULL, $rolevalue,
-        array('onclick' => "showCustomData( 'Participant', {$rolekey}, {$this->_roleCustomDataTypeID} );")
-      );
-    }
-    $this->addGroup($roleTypes, 'role_id', ts('Participant Role'));
-    $this->addRule('role_id', ts('Role is required'), 'required');
+    $this->add('select',
+      'event_type_id',
+      ts('Event Type'),
+      array(
+        '' => ts('- select -')) + CRM_Core_OptionGroup::values('event_type'),
+      TRUE);
 
-    $this->addDateTime('register_date', ts('Registration Date'), TRUE, array('formatType' => 'activityDateTime'));
+    $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
+    $this->add('text', 'title', ts('Event Title'), $attributes['event_title']);
 
-    $status = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
-    $this->add('select', 'status_id', ts('Participant Status'), 
-      array('' => ts('- select -')) + $status, TRUE);
+    $this->addDateTime('start_date', ts('Start Date'), FALSE, array('formatType' => 'activityDateTime'));
+    $this->addDateTime('end_date', ts('End Date / Time'), FALSE, array('formatType' => 'activityDateTime'));
 
-    $this->add('text', 'source', ts('Event Source'));
+    $this->addElement('checkbox', 'is_active', ts('Is this Event Active?'));
 
     $buttons = array(
       array('type' => 'next',
-        'name' => ts('Save and Done'),
+        'name' => ts('Next >>'),
         'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
         'isDefault' => TRUE,
       ),
@@ -105,24 +105,16 @@ class CRM_Mobilise_Form_Alumni extends CRM_Core_Form {
   }
 
   public function postProcess() {
-    require_once 'api/api.php';
-    $values = $this->controller->exportValues($this->_name);
+    $params = $this->controller->exportValues($this->_name);
 
-    foreach ($this->get('cids') as $cid) {
-      if (CRM_Utils_Type::validate($cid, 'Integer')) {
-        $params = 
-          array( 
-            'contact_id'  => $cid,
-            'event_id'    => $this->get('event_id'),
-            'status_id'   => $values['status_id'],
-            'role_id'     => implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys($values['role_id'])),
-            'register_date' => CRM_Utils_Date::processDate($values['register_date'], $values['register_date_time']),
-            'source'        => $values['source'],
-            'version'       => 3,
-          );
-        $result = civicrm_api( 'participant','create',$params );
-      }
-    }
+    //format params
+    $params['start_date'] = CRM_Utils_Date::processDate($params['start_date'], $params['start_date_time']);
+    $params['end_date'] = CRM_Utils_Date::processDate(CRM_Utils_Array::value('end_date', $params),
+      CRM_Utils_Array::value('end_date_time', $params),
+      TRUE
+    );
+    $event = CRM_Event_BAO_Event::create($params);
+    $this->set('event_id', $event->id);
   }
 
   /**
@@ -133,7 +125,7 @@ class CRM_Mobilise_Form_Alumni extends CRM_Core_Form {
    * @return string
    */
   public function getTitle() {
-    return ts('Assign Alumni');
+    return ts('New Event');
   }
 }
 
