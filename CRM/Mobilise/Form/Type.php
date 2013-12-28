@@ -66,7 +66,14 @@ class CRM_Mobilise_Form_Type extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     $this->add('select', 'mobilise_type', ts('Mobilisation'), 
-	       array('' => '- Mobilisation Type -', 'event' => 'Event', 'activity' => 'Activity'), TRUE);
+      array(''     => '- Mobilisation Type -', 
+        'careers'  => 'Careers (Event Type)', 
+        'mentor'   => 'Mentor (Event Type)',
+        'work_exp' => 'Work Experience (Event)',
+        'donations_fundraising' => 'Donations / Fundraising (Activity Type)',
+        'governor' => 'Governor (Activity Type)',
+        'non_careers' => 'Non-Careers Event (Event Type)',
+        'others'      => 'Others (Activity Type)'), TRUE);
     
     $buttons = array(
       array('type' => 'next',

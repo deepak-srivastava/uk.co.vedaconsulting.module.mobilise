@@ -65,6 +65,11 @@ class CRM_Mobilise_Form_Event extends CRM_Core_Form {
         'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
         'isDefault' => TRUE,
       ),
+      array('type' => 'next',
+        'name' => ts('New Event'),
+        'subName' => 'newevent',
+        'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
+      ),
       array(
         'type' => 'cancel',
         'name' => ts('Cancel'),

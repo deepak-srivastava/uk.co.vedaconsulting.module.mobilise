@@ -50,11 +50,20 @@ class CRM_Mobilise_StateMachine_Mobilise extends CRM_Core_StateMachine {
   function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
 
+    $buttonClicked = $controller->getButtonName();
+    if ($buttonClicked == '_qf_Event_next_newevent') {
+	$controller->set('is_new_event', TRUE);
+    }
+
     $this->_pages = array(
       'CRM_Mobilise_Form_Type'    => NULL,
       'CRM_Mobilise_Form_Event'   => NULL,
-      'CRM_Mobilise_Form_Alumni'  => NULL,
     );
+    if ($controller->get('is_new_event')) {
+      $this->_pages['CRM_Mobilise_Form_NewEvent'] = NULL;
+    }
+    $this->_pages['CRM_Mobilise_Form_Alumni'] = NULL;
+
     $this->addSequentialPages($this->_pages, $action);
   }
 }
