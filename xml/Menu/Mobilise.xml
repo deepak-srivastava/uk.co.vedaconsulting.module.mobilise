@@ -2,7 +2,7 @@
 <menu>
   <item>
     <path>civicrm/mobilise</path>
-    <title>Mobilise</title>
+    <title>Mobilisation</title>
     <page_callback>CRM_Mobilise_Controller_Mobilise</page_callback>
     <access_arguments>access CiviCRM</access_arguments>
   </item>

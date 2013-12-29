@@ -34,10 +34,83 @@
  */
 
 /**
- * 
- *
+ * Base class to hold common behaviours for all steps of mobilisation wizard.
  */
-class CRM_Mobilise_Form_Event extends CRM_Mobilise_Form_Mobilise {
+class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
+
+  protected $_metadata = 
+    array(
+      'careers' => array( 
+        'type'  => 'Event',
+        'title' => 'Careers', 
+        'event_fields' => array(
+          'type',
+          'name',
+          'start_date',
+          'end_date'
+        ),
+      ),
+      'mentor' => array( 
+        'type'  => 'Event',
+        'title' => 'Mentor', 
+        'event_fields' => array(
+          'type',
+          'name',
+          'start_date',
+          'end_date'
+        ),
+      ),
+      'work_exp' => array( 
+        'type'  => 'Event',
+        'title' => 'Work Experience', 
+        'event_fields' => array(
+          'type',
+          'name',
+          'start_date',
+          'end_date'
+        ),
+      ),
+      'fundraising' => array( 
+        'type'  => 'Activity',
+        'title' => 'Donations / Fundraising', 
+        'event_fields' => array(
+          'type',
+          'name',
+          'start_date',
+          'end_date'
+        ),
+      ),
+      'governor' => array( 
+        'type'  => 'Activity',
+        'title' => 'Governor', 
+        'event_fields' => array(
+          'type',
+          'name',
+          'start_date',
+          'end_date'
+        ),
+      ),
+      'non_careers' => array( 
+        'type'  => 'Event',
+        'title' => 'Non-Careers', 
+        'event_fields' => array(
+          'type',
+          'name',
+          'start_date',
+          'end_date'
+        ),
+      ),
+      'others' => array( 
+        'type'  => 'Activity',
+        'title' => 'Others', 
+        'event_fields' => array(
+          'type',
+          'name',
+          'start_date',
+          'end_date'
+        ),
+      ),
+    );
 
   /**
    * Function to set variables up before form is built
@@ -46,7 +119,15 @@ class CRM_Mobilise_Form_Event extends CRM_Mobilise_Form_Mobilise {
    * @access public
    */
   public function preProcess() {
-    parent::preProcess();
+    // define in common pre process things
+  }
+
+  function getMobiliseTypes() {
+    $mobTypes = array();
+    foreach ($this->_metadata as $key => $vals) {
+      $mobTypes[$key] = "{$vals['title']} ({$vals['type']})";
+    }
+    return $mobTypes;
   }
 
   /**
@@ -56,19 +137,11 @@ class CRM_Mobilise_Form_Event extends CRM_Mobilise_Form_Mobilise {
    * @access public
    */
   public function buildQuickForm() {
-    $events = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
-    $this->add('select', 'event_id', ts('Select Event'), $events, TRUE);
-
     $buttons = array(
       array('type' => 'next',
         'name' => ts('Next >>'),
         'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
         'isDefault' => TRUE,
-      ),
-      array('type' => 'next',
-        'name' => ts('New Event'),
-        'subName' => 'newevent',
-        'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
       ),
       array(
         'type' => 'cancel',
@@ -76,22 +149,6 @@ class CRM_Mobilise_Form_Event extends CRM_Mobilise_Form_Mobilise {
       ),
     );
     $this->addButtons($buttons);
-  }
-
-  public function postProcess() {
-    $values = $this->controller->exportValues($this->_name);
-    $this->set('event_id', $values['event_id']);
-  }
-
-  /**
-   * Display Name of the form
-   *
-   * @access public
-   *
-   * @return string
-   */
-  public function getTitle() {
-    return ts('Select or Create Mobilisation');
   }
 }
 

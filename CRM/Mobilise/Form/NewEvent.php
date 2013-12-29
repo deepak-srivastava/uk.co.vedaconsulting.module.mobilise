@@ -37,7 +37,7 @@
  * 
  *
  */
-class CRM_Mobilise_Form_NewEvent extends CRM_Core_Form {
+class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
 
   /**
    * Function to set variables up before form is built
@@ -46,7 +46,11 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Core_Form {
    * @access public
    */
   public function preProcess() {
+    $mptype = $this->get('mtype');
+    $this->assign('event_fields', $this->_metadata[$mptype]['event_fields']);
+
     parent::preProcess();
+
   }
 
   /**
@@ -75,33 +79,26 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Core_Form {
    * @access public
    */
   public function buildQuickForm() {
-    $this->add('select',
-      'event_type_id',
-      ts('Event Type'),
-      array(
-        '' => ts('- select -')) + CRM_Core_OptionGroup::values('event_type'),
-      TRUE);
+    $mptype = $this->get('mtype');
 
-    $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
-    $this->add('text', 'title', ts('Event Title'), $attributes['event_title']);
-
-    $this->addDateTime('start_date', ts('Start Date'), FALSE, array('formatType' => 'activityDateTime'));
-    $this->addDateTime('end_date', ts('End Date / Time'), FALSE, array('formatType' => 'activityDateTime'));
-
-    $this->addElement('checkbox', 'is_active', ts('Is this Event Active?'));
-
-    $buttons = array(
-      array('type' => 'next',
-        'name' => ts('Next >>'),
-        'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
-        'isDefault' => TRUE,
-      ),
-      array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ),
-    );
-    $this->addButtons($buttons);
+    if (in_array('type', $this->_metadata[$mptype]['event_fields'])) {
+      $this->add('select', 'event_type_id', ts('Event Type'),
+        array('' => ts('- select -')) + CRM_Core_OptionGroup::values('event_type'), TRUE);
+    }
+    if (in_array('name', $this->_metadata[$mptype]['event_fields'])) {
+      $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
+      $this->add('text', 'title', ts('Event Name'), $attributes['event_title']);
+    }
+    if (in_array('start_date', $this->_metadata[$mptype]['event_fields'])) {
+      $this->addDateTime('start_date', ts('Start Date'), FALSE, array('formatType' => 'activityDateTime'));
+    }
+    if (in_array('end_date', $this->_metadata[$mptype]['event_fields'])) {
+      $this->addDateTime('end_date', ts('End Date / Time'), FALSE, array('formatType' => 'activityDateTime'));
+    }
+    if (in_array('is_active', $this->_metadata[$mptype]['event_fields'])) {
+      $this->addElement('checkbox', 'is_active', ts('Is this Event Active?'));
+    }
+    parent::buildQuickForm();
   }
 
   public function postProcess() {
@@ -109,10 +106,12 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Core_Form {
 
     //format params
     $params['start_date'] = CRM_Utils_Date::processDate($params['start_date'], $params['start_date_time']);
-    $params['end_date'] = CRM_Utils_Date::processDate(CRM_Utils_Array::value('end_date', $params),
+    $params['end_date']   = CRM_Utils_Date::processDate(CRM_Utils_Array::value('end_date', $params),
       CRM_Utils_Array::value('end_date_time', $params),
       TRUE
     );
+    $params['is_active']  = CRM_Utils_Array::value('is_active', $params, 1);
+
     $event = CRM_Event_BAO_Event::create($params);
     $this->set('event_id', $event->id);
   }

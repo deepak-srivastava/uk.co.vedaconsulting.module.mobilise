@@ -37,7 +37,7 @@
  * 
  *
  */
-class CRM_Mobilise_Form_Alumni extends CRM_Core_Form {
+class CRM_Mobilise_Form_Alumni extends CRM_Mobilise_Form_Mobilise {
 
   /**
    * Function to set variables up before form is built
@@ -90,18 +90,7 @@ class CRM_Mobilise_Form_Alumni extends CRM_Core_Form {
 
     $this->add('text', 'source', ts('Event Source'));
 
-    $buttons = array(
-      array('type' => 'next',
-        'name' => ts('Save and Done'),
-        'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
-        'isDefault' => TRUE,
-      ),
-      array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ),
-    );
-    $this->addButtons($buttons);
+    parent::buildQuickForm();
   }
 
   public function postProcess() {

@@ -37,7 +37,7 @@
  * 
  *
  */
-class CRM_Mobilise_Form_Type extends CRM_Core_Form {
+class CRM_Mobilise_Form_Type extends CRM_Mobilise_Form_Mobilise {
 
   /**
    * Function to set variables up before form is built
@@ -65,32 +65,14 @@ class CRM_Mobilise_Form_Type extends CRM_Core_Form {
    * @access public
    */
   public function buildQuickForm() {
-    $this->add('select', 'mobilise_type', ts('Mobilisation'), 
-      array(''     => '- Mobilisation Type -', 
-        'careers'  => 'Careers (Event Type)', 
-        'mentor'   => 'Mentor (Event Type)',
-        'work_exp' => 'Work Experience (Event)',
-        'donations_fundraising' => 'Donations / Fundraising (Activity Type)',
-        'governor' => 'Governor (Activity Type)',
-        'non_careers' => 'Non-Careers Event (Event Type)',
-        'others'      => 'Others (Activity Type)'), TRUE);
-    
-    $buttons = array(
-      array('type' => 'next',
-        'name' => ts('Next >>'),
-        'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
-        'isDefault' => TRUE,
-      ),
-      array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ),
-    );
-    $this->addButtons($buttons);
+    $this->add('select', 'mobilise_type', ts('Mobilisation'), $this->getMobiliseTypes(), TRUE);
+
+    parent::buildQuickForm();
   }
 
   public function postProcess() {
     $values = $this->controller->exportValues($this->_name);
+    $this->set('mtype', $values['mobilise_type']);
   }
 
   /**
