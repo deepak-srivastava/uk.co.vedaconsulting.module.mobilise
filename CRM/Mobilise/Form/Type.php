@@ -56,6 +56,7 @@ class CRM_Mobilise_Form_Type extends CRM_Mobilise_Form_Mobilise {
     if (empty($cids)) {
       CRM_Core_Error::fatal(ts("Could not find valid contact ids"));
     }
+    parent::preProcess();
   }
 
   /**

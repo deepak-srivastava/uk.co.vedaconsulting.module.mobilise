@@ -50,7 +50,6 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
     $this->assign('event_fields', $this->_metadata[$mptype]['event_fields']);
 
     parent::preProcess();
-
   }
 
   /**

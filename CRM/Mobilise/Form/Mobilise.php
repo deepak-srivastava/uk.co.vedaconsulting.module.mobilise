@@ -119,7 +119,9 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
    * @access public
    */
   public function preProcess() {
-    // define in common pre process things
+    $session = CRM_Core_Session::singleton();
+    //FIXME: report instance id is hardcoded
+    $session->pushUserContext(CRM_Utils_System::url('civicrm/report/instance/41', 'force=1'));
   }
 
   function getMobiliseTypes() {
