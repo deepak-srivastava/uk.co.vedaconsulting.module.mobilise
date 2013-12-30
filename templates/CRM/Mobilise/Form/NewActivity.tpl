@@ -1,5 +1,4 @@
-<?php
-/*
+{*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.2                                                |
  +--------------------------------------------------------------------+
@@ -23,77 +22,19 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+*}
+<div class="crm-block crm-form-block crm-mailing-group-form-block">
+{include file="CRM/common/WizardHeader.tpl"}
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2012
- * $Id$
- *
- */
+  <table class="form-layout">
+    <tr class="crm-mobilise-group-type-block-title">
+      <td class="label">{$form.label.label}</td>
+      <td>{$form.label.html}<br />
+	<span class="description"> {ts}Please use only alphanumeric, spaces, hyphens and dashes for activity names.{/ts} 
+	</span>
+      </td>
+    </tr>
+  </table>
 
-/**
- * 
- *
- */
-class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
-
-  /**
-   * Function to set variables up before form is built
-   *
-   * @return void
-   * @access public
-   */
-  public function preProcess() {
-    $mptype = $this->get('mtype');
-    $this->assign('activity_fields', $this->_metadata[$mptype]['activity_fields']);
-
-    parent::preProcess();
-  }
-
-  /**
-   * This function sets the default values for the form in edit/view mode
-   * the default values are retrieved from the database
-   *
-   * @access public
-   *
-   * @return None
-   */
-  public function setDefaultValues() {
-    $defaults = array();
-
-    return $defaults;
-  }
-
-  /**
-   * Function to actually build the form
-   *
-   * @return None
-   * @access public
-   */
-  public function buildQuickForm() {
-    $mptype = $this->get('mtype');
-
-    $this->addDateTime('activity_date_time', ts('Date'), TRUE, array('formatType' => 'activityDateTime'));
-
-    $this->add('select', 'status_id', ts('Status'), CRM_Core_PseudoConstant::activityStatus(), TRUE);
-
-    parent::buildQuickForm();
-  }
-
-  public function postProcess() {
-  }
-
-  /**
-   * Display Name of the form
-   *
-   * @access public
-   *
-   * @return string
-   */
-  public function getTitle() {
-    return ts('Assign Alumni');
-  }
-}
-
+<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
+</div>

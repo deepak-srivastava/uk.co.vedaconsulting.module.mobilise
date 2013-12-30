@@ -37,7 +37,7 @@
  * 
  *
  */
-class CRM_Mobilise_Form_Activity extends CRM_Mobilise_Form_Mobilise {
+class CRM_Mobilise_Form_NewActivity extends CRM_Mobilise_Form_Mobilise {
 
   /**
    * Function to set variables up before form is built
@@ -56,37 +56,19 @@ class CRM_Mobilise_Form_Activity extends CRM_Mobilise_Form_Mobilise {
    * @access public
    */
   public function buildQuickForm() {
-    $activityTypes = CRM_Core_PseudoConstant::activityType();
-    $this->add('select', 'activity_id', ts('Select Activity'), $activityTypes, TRUE);
+    $this->add('text', 'label', ts('Label'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'label'), TRUE);
 
-    $buttons = array(
-      array('type' => 'next',
-        'name' => ts('Use Selected Activity'),
-        'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
-        'isDefault' => TRUE,
-      ),
-      array('type' => 'next',
-        'name' => ts('New Activity'),
-        'subName' => 'newact',
-        'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
-      ),
-      array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ),
-    );
-    $this->addButtons($buttons);
+    parent::buildQuickForm();
   }
 
   public function postProcess() {
-    $buttonClicked = $this->controller->getButtonName();
-    if ($buttonClicked == '_qf_Activity_next_newact') {
-      $this->controller->set('is_new_activity', TRUE);
-    } else {
-      $values = $this->controller->exportValues($this->_name);
-      $this->set('activity_id', $values['activity_id']);
-    }
-    $this->controller->set('ignore_confirm', TRUE);
+    $params = $this->controller->exportValues($this->_name);
+
+    $action = CRM_Core_Action::ADD;
+    $optionValID = NULL;
+    $groupParams = array('name' => 'activity_type');
+    $optionValue = CRM_Core_OptionValue::addOptionValue($params, $groupParams, $action, $optionValID);
+    $this->set('activity_id', $optionValue->id);
   }
 
   /**
@@ -97,7 +79,7 @@ class CRM_Mobilise_Form_Activity extends CRM_Mobilise_Form_Mobilise {
    * @return string
    */
   public function getTitle() {
-    return ts('Select or Create Mobilisation');
+    return ts('New Activity');
   }
 }
 
