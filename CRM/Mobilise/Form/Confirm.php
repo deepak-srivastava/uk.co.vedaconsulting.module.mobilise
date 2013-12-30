@@ -77,7 +77,7 @@ class CRM_Mobilise_Form_Confirm extends CRM_Mobilise_Form_Mobilise {
    * @return string
    */
   public function getTitle() {
-    return ts('Still Computing..');
+    return ts('In Progress..');
   }
 }
 

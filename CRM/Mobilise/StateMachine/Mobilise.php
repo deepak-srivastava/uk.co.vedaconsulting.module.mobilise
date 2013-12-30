@@ -80,6 +80,9 @@ class CRM_Mobilise_StateMachine_Mobilise extends CRM_Core_StateMachine {
 
     }
 
+    if ($controller->get('ignore_confirm')) {
+      unset($this->_pages['CRM_Mobilise_Form_Confirm']);
+    }
     $this->addSequentialPages($this->_pages, $action);
   }
 }

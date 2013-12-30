@@ -79,13 +79,14 @@ class CRM_Mobilise_Form_Event extends CRM_Mobilise_Form_Mobilise {
   }
 
   public function postProcess() {
-    $buttonClicked = $controller->getButtonName();
+    $buttonClicked = $this->controller->getButtonName();
     if ($buttonClicked == '_qf_Event_next_newevent') {
-      $controller->set('is_new_event', TRUE);
+      $this->controller->set('is_new_event', TRUE);
     } else {
-	$values = $this->controller->exportValues($this->_name);
-	$this->set('event_id', $values['event_id']);
+      $values = $this->controller->exportValues($this->_name);
+      $this->set('event_id', $values['event_id']);
     }
+    $this->controller->set('ignore_confirm', TRUE);
   }
 
   /**

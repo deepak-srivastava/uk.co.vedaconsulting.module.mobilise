@@ -80,6 +80,7 @@ class CRM_Mobilise_Form_Activity extends CRM_Mobilise_Form_Mobilise {
   public function postProcess() {
     $values = $this->controller->exportValues($this->_name);
     $this->set('activity_id', $values['activity_id']);
+    $this->controller->set('ignore_confirm', TRUE);
   }
 
   /**
