@@ -62,7 +62,7 @@ class CRM_Mobilise_StateMachine_Mobilise extends CRM_Core_StateMachine {
     if ($controller->get('is_new_event')) {
       $this->_pages['CRM_Mobilise_Form_NewEvent'] = NULL;
     }
-    $this->_pages['CRM_Mobilise_Form_Alumni'] = NULL;
+    $this->_pages['CRM_Mobilise_Form_Participant'] = NULL;
 
     $this->addSequentialPages($this->_pages, $action);
   }

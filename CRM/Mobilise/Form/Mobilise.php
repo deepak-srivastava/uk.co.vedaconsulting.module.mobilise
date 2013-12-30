@@ -49,6 +49,12 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'start_date',
           'end_date'
         ),
+        'participant_fields' => array(
+          'role' => array('Staff Contact', 'Student Contact', 'Alumnus'),
+          'register_date',
+          'status',
+          'source'
+        ),
       ),
       'mentor' => array( 
         'type'  => 'Event',
@@ -58,6 +64,12 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'name',
           'start_date',
           'end_date'
+        ),
+        'participant_fields' => array(
+          'role' => array('Staff Contact', 'Student Contact', 'Alumnus'),
+          'register_date',
+          'status',
+          'source'
         ),
       ),
       'work_exp' => array( 
@@ -69,11 +81,17 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'start_date',
           'end_date'
         ),
+        'participant_fields' => array(
+          'role' => array('Staff Contact', 'Student Contact', 'Alumnus'),
+          'register_date',
+          'status',
+          'source'
+        ),
       ),
       'fundraising' => array( 
         'type'  => 'Activity',
         'title' => 'Donations / Fundraising', 
-        'event_fields' => array(
+        'activity_fields' => array(
           'type',
           'name',
           'start_date',
@@ -83,7 +101,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
       'governor' => array( 
         'type'  => 'Activity',
         'title' => 'Governor', 
-        'event_fields' => array(
+        'activity_fields' => array(
           'type',
           'name',
           'start_date',
@@ -99,11 +117,17 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'start_date',
           'end_date'
         ),
+        'participant_fields' => array(
+          'role' => array('Staff Contact', 'Student Contact', 'Alumnus'),
+          'register_date',
+          'status',
+          'source'
+        ),
       ),
       'others' => array( 
         'type'  => 'Activity',
         'title' => 'Others', 
-        'event_fields' => array(
+        'activity_fields' => array(
           'type',
           'name',
           'start_date',

@@ -37,7 +37,7 @@
  * 
  *
  */
-class CRM_Mobilise_Form_Alumni extends CRM_Mobilise_Form_Mobilise {
+class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
 
   /**
    * Function to set variables up before form is built
@@ -46,6 +46,9 @@ class CRM_Mobilise_Form_Alumni extends CRM_Mobilise_Form_Mobilise {
    * @access public
    */
   public function preProcess() {
+    $mptype = $this->get('mtype');
+    $this->assign('participant_fields', $this->_metadata[$mptype]['participant_fields']);
+
     parent::preProcess();
   }
 
@@ -59,7 +62,6 @@ class CRM_Mobilise_Form_Alumni extends CRM_Mobilise_Form_Mobilise {
    */
   public function setDefaultValues() {
     $defaults = array();
-    
     list($defaults['register_date'], $defaults['register_date_time']) = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
 
     return $defaults;
@@ -72,24 +74,30 @@ class CRM_Mobilise_Form_Alumni extends CRM_Mobilise_Form_Mobilise {
    * @access public
    */
   public function buildQuickForm() {
-    $roleTypes = array();
-    $roleids   = CRM_Event_PseudoConstant::participantRole();
-    foreach ($roleids as $rolekey => $rolevalue) {
-      $roleTypes[] = $this->createElement('checkbox', $rolekey, NULL, $rolevalue,
-        array('onclick' => "showCustomData( 'Participant', {$rolekey}, {$this->_roleCustomDataTypeID} );")
-      );
+    $mptype = $this->get('mtype');
+
+    if (array_key_exists('role', $this->_metadata[$mptype]['participant_fields'])) {
+      $roleTypes = array();
+      $roleids   = CRM_Event_PseudoConstant::participantRole();
+      foreach ($roleids as $rolekey => $rolevalue) {
+        $roleTypes[] = 
+          $this->createElement('checkbox', $rolekey, NULL, $rolevalue,
+            array('onclick' => "showCustomData( 'Participant', {$rolekey}, {$this->_roleCustomDataTypeID} );"));
+      }
+      $this->addGroup($roleTypes, 'role_id', ts('Participant Role'));
+      $this->addRule('role_id', ts('Role is required'), 'required');
     }
-    $this->addGroup($roleTypes, 'role_id', ts('Participant Role'));
-    $this->addRule('role_id', ts('Role is required'), 'required');
-
-    $this->addDateTime('register_date', ts('Registration Date'), TRUE, array('formatType' => 'activityDateTime'));
-
-    $status = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
-    $this->add('select', 'status_id', ts('Participant Status'), 
-      array('' => ts('- select -')) + $status, TRUE);
-
-    $this->add('text', 'source', ts('Event Source'));
-
+    if (in_array('register_date', $this->_metadata[$mptype]['participant_fields'])) {
+      $this->addDateTime('register_date', ts('Registration Date'), TRUE, array('formatType' => 'activityDateTime'));
+    }
+    if (in_array('status', $this->_metadata[$mptype]['participant_fields'])) {
+      $status = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
+      $this->add('select', 'status_id', ts('Participant Status'), 
+        array('' => ts('- select -')) + $status, TRUE);
+    }
+    if (in_array('source', $this->_metadata[$mptype]['participant_fields'])) {
+      $this->add('text', 'source', ts('Event Source'));
+    }
     parent::buildQuickForm();
   }
 
