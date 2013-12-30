@@ -73,7 +73,10 @@ class CRM_Mobilise_Form_Type extends CRM_Mobilise_Form_Mobilise {
 
   public function postProcess() {
     $values = $this->controller->exportValues($this->_name);
-    $this->set('mtype', $values['mobilise_type']);
+    $mType  = $values['mobilise_type'];
+    $this->set('mtype', $mType);
+
+    $this->controller->set('workflow', strtolower($this->_metadata[$mType]['type']));
   }
 
   /**

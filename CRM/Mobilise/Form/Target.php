@@ -37,7 +37,7 @@
  * 
  *
  */
-class CRM_Mobilise_Form_Event extends CRM_Mobilise_Form_Mobilise {
+class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
 
   /**
    * Function to set variables up before form is built
@@ -46,7 +46,24 @@ class CRM_Mobilise_Form_Event extends CRM_Mobilise_Form_Mobilise {
    * @access public
    */
   public function preProcess() {
+    $mptype = $this->get('mtype');
+    $this->assign('activity_fields', $this->_metadata[$mptype]['activity_fields']);
+
     parent::preProcess();
+  }
+
+  /**
+   * This function sets the default values for the form in edit/view mode
+   * the default values are retrieved from the database
+   *
+   * @access public
+   *
+   * @return None
+   */
+  public function setDefaultValues() {
+    $defaults = array();
+
+    return $defaults;
   }
 
   /**
@@ -56,36 +73,12 @@ class CRM_Mobilise_Form_Event extends CRM_Mobilise_Form_Mobilise {
    * @access public
    */
   public function buildQuickForm() {
-    $events = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
-    $this->add('select', 'event_id', ts('Select Event'), $events, TRUE);
+    $mptype = $this->get('mtype');
 
-    $buttons = array(
-      array('type' => 'next',
-        'name' => ts('Use Selected Event'),
-        'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
-        'isDefault' => TRUE,
-      ),
-      array('type' => 'next',
-        'name' => ts('New Event'),
-        'subName' => 'newevent',
-        'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
-      ),
-      array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ),
-    );
-    $this->addButtons($buttons);
+    parent::buildQuickForm();
   }
 
   public function postProcess() {
-    $buttonClicked = $controller->getButtonName();
-    if ($buttonClicked == '_qf_Event_next_newevent') {
-      $controller->set('is_new_event', TRUE);
-    } else {
-	$values = $this->controller->exportValues($this->_name);
-	$this->set('event_id', $values['event_id']);
-    }
   }
 
   /**
@@ -96,7 +89,7 @@ class CRM_Mobilise_Form_Event extends CRM_Mobilise_Form_Mobilise {
    * @return string
    */
   public function getTitle() {
-    return ts('Select or Create Mobilisation');
+    return ts('Assign Alumni');
   }
 }
 

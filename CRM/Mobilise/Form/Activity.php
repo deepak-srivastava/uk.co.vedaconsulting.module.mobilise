@@ -37,7 +37,7 @@
  * 
  *
  */
-class CRM_Mobilise_Form_Event extends CRM_Mobilise_Form_Mobilise {
+class CRM_Mobilise_Form_Activity extends CRM_Mobilise_Form_Mobilise {
 
   /**
    * Function to set variables up before form is built
@@ -56,17 +56,16 @@ class CRM_Mobilise_Form_Event extends CRM_Mobilise_Form_Mobilise {
    * @access public
    */
   public function buildQuickForm() {
-    $events = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
-    $this->add('select', 'event_id', ts('Select Event'), $events, TRUE);
+    $this->add('select', 'activity_id', ts('Select Activity'), array('act' => 'act'), TRUE);
 
     $buttons = array(
       array('type' => 'next',
-        'name' => ts('Use Selected Event'),
+        'name' => ts('Use Selected Activity'),
         'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
         'isDefault' => TRUE,
       ),
       array('type' => 'next',
-        'name' => ts('New Event'),
+        'name' => ts('New Activity'),
         'subName' => 'newevent',
         'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
       ),
@@ -79,13 +78,8 @@ class CRM_Mobilise_Form_Event extends CRM_Mobilise_Form_Mobilise {
   }
 
   public function postProcess() {
-    $buttonClicked = $controller->getButtonName();
-    if ($buttonClicked == '_qf_Event_next_newevent') {
-      $controller->set('is_new_event', TRUE);
-    } else {
-	$values = $this->controller->exportValues($this->_name);
-	$this->set('event_id', $values['event_id']);
-    }
+    $values = $this->controller->exportValues($this->_name);
+    $this->set('activity_id', $values['activity_id']);
   }
 
   /**

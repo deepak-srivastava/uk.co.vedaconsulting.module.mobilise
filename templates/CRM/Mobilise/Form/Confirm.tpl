@@ -1,5 +1,4 @@
-<?php
-/*
+{*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.2                                                |
  +--------------------------------------------------------------------+
@@ -23,64 +22,9 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+*}
+<div class="crm-block crm-form-block crm-mailing-group-form-block">
+{include file="CRM/common/WizardHeader.tpl"}
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2012
- * $Id$
- *
- */
-
-/**
- * State machine for managing different states of the Import process.
- *
- */
-class CRM_Mobilise_StateMachine_Mobilise extends CRM_Core_StateMachine {
-
-  /**
-   * class constructor
-   *
-   * @param object  CRM_Mobilise_Controller
-   * @param int     $action
-   *
-   * @return object CRM_Mobilise_StateMachine
-   */
-  function __construct($controller, $action = CRM_Core_Action::NONE) {
-    parent::__construct($controller, $action);
-
-    $this->_pages = array(
-      'CRM_Mobilise_Form_Type'    => NULL,
-      'CRM_Mobilise_Form_Confirm' => NULL,
-    );
-
-    $workflow = $controller->get('workflow');
-    if ($controller->get('workflow') == 'activity') {
-      $this->_pages = array(
-        'CRM_Mobilise_Form_Type'      => NULL,
-        'CRM_Mobilise_Form_Activity'  => NULL,
-      );
-      if ($controller->get('is_new_activity')) {
-        $this->_pages['CRM_Mobilise_Form_NewActivity'] = NULL;
-      }
-      $this->_pages['CRM_Mobilise_Form_Target']  = NULL;
-      $this->_pages['CRM_Mobilise_Form_Confirm'] = NULL;
-
-    } else if ($controller->get('workflow') == 'event') {
-      $this->_pages = array(
-        'CRM_Mobilise_Form_Type'      => NULL,
-        'CRM_Mobilise_Form_Event'     => NULL,
-      );
-      if ($controller->get('is_new_event')) {
-        $this->_pages['CRM_Mobilise_Form_NewEvent'] = NULL;
-      }
-      $this->_pages['CRM_Mobilise_Form_Participant'] = NULL;
-      $this->_pages['CRM_Mobilise_Form_Confirm']     = NULL;
-
-    }
-
-    $this->addSequentialPages($this->_pages, $action);
-  }
-}
-
+<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
+</div>
