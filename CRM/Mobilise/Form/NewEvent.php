@@ -112,6 +112,7 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
     $params['is_active']  = CRM_Utils_Array::value('is_active', $params, 1);
 
     // custom handling
+    $customFlag = FALSE;
     $customFields = CRM_Core_BAO_CustomField::getFields('Event', FALSE, FALSE,
       CRM_Utils_Array::value('event_type_id', $params)
     );
@@ -122,14 +123,17 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
         $params["custom_{$cfID}_-1"] = "sample text"; 
         // its the following user id that will be considered as contact-ref-id
         $params["custom_{$cfID}_-1_id"] = $this->_currentUserId;
+        $customFlag = TRUE;
       }
     }
-    $entityID = NULL;
-    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $customFields,
-      $entityID,
-      'Event'
-    );
+    if ($customFlag) {
+      $entityID = NULL;
+      $params['custom'] = 
+        CRM_Core_BAO_CustomField::postProcess($params,
+          $customFields,
+          $entityID,
+          'Event');
+    }
     $event = CRM_Event_BAO_Event::create($params);
     $this->set('event_id', $event->id);
   }
