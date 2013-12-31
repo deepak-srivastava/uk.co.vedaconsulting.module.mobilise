@@ -57,9 +57,6 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
       CRM_Core_Error::fatal("Can't determine activity type.");
     }
 
-    $session = CRM_Core_Session::singleton();
-    $this->_currentUserId = $session->get('userID');
-
     parent::preProcess();
   }
 

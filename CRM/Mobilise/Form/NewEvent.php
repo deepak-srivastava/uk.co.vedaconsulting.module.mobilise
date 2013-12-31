@@ -111,6 +111,25 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
     );
     $params['is_active']  = CRM_Utils_Array::value('is_active', $params, 1);
 
+    // custom handling
+    $customFields = CRM_Core_BAO_CustomField::getFields('Event', FALSE, FALSE,
+      CRM_Utils_Array::value('event_type_id', $params)
+    );
+    foreach ($customFields as $cfID => $vals) {
+      if ($vals['label'] == CRM_Mobilise_Form_Mobilise::SCHOOL_HOST_CUSTOM_FIELD_TITLE && 
+        $vals['groupTitle'] == CRM_Mobilise_Form_Mobilise::SCHOOL_CUSTOM_SET_TITLE) {
+        // since this is ref field. This text is not going to be taken. Its required for consideration.
+        $params["custom_{$cfID}_-1"] = "sample text"; 
+        // its the following user id that will be considered as contact-ref-id
+        $params["custom_{$cfID}_-1_id"] = $this->_currentUserId;
+      }
+    }
+    $entityID = NULL;
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
+      $customFields,
+      $entityID,
+      'Event'
+    );
     $event = CRM_Event_BAO_Event::create($params);
     $this->set('event_id', $event->id);
   }

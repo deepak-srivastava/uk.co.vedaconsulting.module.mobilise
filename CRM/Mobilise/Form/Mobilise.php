@@ -37,6 +37,9 @@
  * Base class to hold common behaviours for all steps of mobilisation wizard.
  */
 class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
+  const
+    SCHOOL_CUSTOM_SET_TITLE = 'School Events Data',
+    SCHOOL_HOST_CUSTOM_FIELD_TITLE = 'Hosting School';
 
   protected $_metadata = 
     array(
@@ -143,6 +146,8 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
     //FIXME: report instance id is hardcoded
     $session->pushUserContext(CRM_Utils_System::url('civicrm/report/instance/41', 'force=1'));
+
+    $this->_currentUserId = $session->get('userID');
   }
 
   function getMobiliseTypes() {
