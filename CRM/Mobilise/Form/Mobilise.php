@@ -92,20 +92,18 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
         'type'  => 'Activity',
         'title' => 'Donations / Fundraising', 
         'activity_fields' => array(
-          'type',
-          'name',
-          'start_date',
-          'end_date'
+          'activity_type',
+          'activity_date',
+          'status',
         ),
       ),
       'governor' => array( 
         'type'  => 'Activity',
         'title' => 'Governor', 
         'activity_fields' => array(
-          'type',
-          'name',
-          'start_date',
-          'end_date'
+          'activity_type',
+          'activity_date',
+          'status',
         ),
       ),
       'non_careers' => array( 
@@ -128,10 +126,9 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
         'type'  => 'Activity',
         'title' => 'Others', 
         'activity_fields' => array(
-          'type',
-          'name',
-          'start_date',
-          'end_date'
+          'activity_type',
+          'activity_date',
+          'status',
         ),
       ),
     );

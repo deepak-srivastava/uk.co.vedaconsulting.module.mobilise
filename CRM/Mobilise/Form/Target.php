@@ -49,6 +49,17 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
     $mptype = $this->get('mtype');
     $this->assign('activity_fields', $this->_metadata[$mptype]['activity_fields']);
 
+    $this->_activityTypeId = $this->get('activity_id');
+    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, TRUE);
+    if ($actType = CRM_Utils_Array::value($this->_activityTypeId, $activityTypes)) {
+      $this->assign('activityType', $actType);
+    } else {
+      CRM_Core_Error::fatal("Can't determine activity type.");
+    }
+
+    $session = CRM_Core_Session::singleton();
+    $this->_currentUserId = $session->get('userID');
+
     parent::preProcess();
   }
 
@@ -62,6 +73,7 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
    */
   public function setDefaultValues() {
     $defaults = array();
+    list($defaults['activity_date_time'], $defaults['activity_date_time_time']) = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
 
     return $defaults;
   }
@@ -75,14 +87,29 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
   public function buildQuickForm() {
     $mptype = $this->get('mtype');
 
-    $this->addDateTime('activity_date_time', ts('Date'), TRUE, array('formatType' => 'activityDateTime'));
-
-    $this->add('select', 'status_id', ts('Status'), CRM_Core_PseudoConstant::activityStatus(), TRUE);
-
+    if (in_array('activity_date', $this->_metadata[$mptype]['activity_fields'])) {
+      $this->addDateTime('activity_date_time', ts('Date'), TRUE, array('formatType' => 'activityDateTime'));
+    }
+    if (in_array('status', $this->_metadata[$mptype]['activity_fields'])) {
+      $this->add('select', 'status_id', ts('Status'), CRM_Core_PseudoConstant::activityStatus(), TRUE);
+    }
     parent::buildQuickForm();
   }
 
   public function postProcess() {
+    $params  = $this->controller->exportValues($this->_name);
+
+    $params['source_contact_id']  = $this->_currentUserId;
+    $params['activity_type_id']   = $this->_activityTypeId;
+    $params['activity_date_time'] = CRM_Utils_Date::processDate(
+      $params['activity_date_time'], $params['activity_date_time_time']);
+    
+    foreach ($this->get('cids') as $cid) {
+      if (CRM_Utils_Type::validate($cid, 'Integer')) {
+        $params['target_contact_id']  = array($cid);
+        $activity = CRM_Activity_BAO_Activity::create($params);
+      }
+    }
   }
 
   /**
@@ -96,4 +123,3 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
     return ts('Assign Alumni');
   }
 }
-

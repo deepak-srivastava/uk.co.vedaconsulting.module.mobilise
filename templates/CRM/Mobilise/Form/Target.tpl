@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div class="crm-block crm-form-block crm-mobilise-group-alumni-block">
+<div class="crm-block crm-form-block crm-mobilise-group-target-block">
 {include file="CRM/common/WizardHeader.tpl"}
 
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
@@ -36,30 +36,22 @@
     <div class="crm-accordion-body">
 
       <table class="form-layout-compressed">
-	{if array_key_exists('role', $participant_fields)}
-	<tr class="crm-mobilise-group-alumni-block-role_id"><td class="label">{$form.role_id.label}</td><td>{$form.role_id.html}</td></tr>
+	{if in_array('activity_type', $activity_fields)}
+	<tr class="crm-mobilise-group-target-block-activity_type"><td class="label">{ts}Activity Type{/ts}</td><td>{$activityType}</td></tr>
 	{/if}
-	{if in_array('register_date', $participant_fields)}
-	<tr class="crm-mobilise-group-alumni-block-register_date">
-	  <td class="label">{$form.register_date.label}</td>
-	  <td>
-	    {if $hideCalendar neq true}
-	      {include file="CRM/common/jcalendar.tpl" elementName=register_date}
-	    {else}
-	      {$form.register_date.html|crmDate}
-	    {/if}
-	  </td>
+	{if in_array('activity_date', $activity_fields)}
+	<tr class="crm-mobilise-group-target-block-activity_date_time">
+	  <td class="label">{$form.activity_date_time.label}</td>
+	  {if $hideCalendar neq true}
+	  <td class="view-value">{include file="CRM/common/jcalendar.tpl" elementName=activity_date_time}</td>
+	  {else}
+	  <td class="view-value">{$form.activity_date_time.html|crmDate}</td>
+	  {/if}
 	</tr>
 	{/if}
-	{if in_array('status', $participant_fields)}
-	<tr class="crm-mobilise-group-alumni-block-status_id">
+	{if in_array('status', $activity_fields)}
+	<tr class="crm-mobilise-group-target-block-status_id">
 	  <td class="label">{$form.status_id.label}</td><td>{$form.status_id.html}</td>
-	</tr>
-	{/if}
-	{if in_array('source', $participant_fields)}
-	<tr class="crm-mobilise-group-alumni-block-source">
-	  <td class="label">{$form.source.label}</td><td>{$form.source.html|crmReplace:class:huge}<br />
-	    <span class="description">{ts}Source for this registration (if applicable).{/ts}</span></td>
 	</tr>
 	{/if}
       </table>

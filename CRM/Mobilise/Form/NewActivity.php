@@ -63,12 +63,13 @@ class CRM_Mobilise_Form_NewActivity extends CRM_Mobilise_Form_Mobilise {
 
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
+    $params['is_active']  = CRM_Utils_Array::value('is_active', $params, 1);
 
     $action = CRM_Core_Action::ADD;
     $optionValID = NULL;
     $groupParams = array('name' => 'activity_type');
     $optionValue = CRM_Core_OptionValue::addOptionValue($params, $groupParams, $action, $optionValID);
-    $this->set('activity_id', $optionValue->id);
+    $this->set('activity_id', $optionValue->value);
   }
 
   /**
