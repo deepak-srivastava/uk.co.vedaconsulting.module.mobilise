@@ -27,7 +27,7 @@
 {include file="CRM/common/WizardHeader.tpl"}
 
   <table class="form-layout">
-    {if in_array('type', $event_fields)}
+    {if array_key_exists('type', $event_fields)}
     <tr class="crm-mobilise-group-type-block-event_type_id">
       <td class="label">{$form.event_type_id.label}</td>
       <td>{$form.event_type_id.html}</td>

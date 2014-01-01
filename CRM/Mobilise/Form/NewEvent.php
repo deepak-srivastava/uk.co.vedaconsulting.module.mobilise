@@ -46,8 +46,8 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
    * @access public
    */
   public function preProcess() {
-    $mptype = $this->get('mtype');
-    $this->assign('event_fields', $this->_metadata[$mptype]['event_fields']);
+    $this->_mtype = $this->get('mtype');
+    $this->assign('event_fields', $this->_metadata[$this->_mtype]['event_fields']);
 
     parent::preProcess();
   }
@@ -68,6 +68,9 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
       CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
     $defaults['is_active'] = 1;
 
+    $eventTypes = array_flip(CRM_Core_OptionGroup::values('event_type'));
+    $defaults['event_type_id'] = CRM_Utils_Array::value($this->_metadata[$this->_mtype]['event_fields']['type'], $eventTypes);
+
     return $defaults;
   }
 
@@ -78,28 +81,31 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
    * @access public
    */
   public function buildQuickForm() {
-    $mptype = $this->get('mtype');
-
-    if (in_array('type', $this->_metadata[$mptype]['event_fields'])) {
-      $this->add('select', 'event_type_id', ts('Event Type'),
-        array('' => ts('- select -')) + CRM_Core_OptionGroup::values('event_type'), TRUE);
+    if (array_key_exists('type', $this->_metadata[$this->_mtype]['event_fields'])) {
+      $eventTypes = CRM_Core_OptionGroup::values('event_type');
+      $element    = 
+        $this->add('select', 'event_type_id', ts('Event Type'),
+          array('' => ts('- select -')) + $eventTypes, TRUE);
+      if (CRM_Utils_Array::value($this->_metadata[$this->_mtype]['event_fields']['type'], array_flip($eventTypes))) {
+        $element->freeze();
+      }
     }
-    if (in_array('name', $this->_metadata[$mptype]['event_fields'])) {
+    if (in_array('name', $this->_metadata[$this->_mtype]['event_fields'])) {
       $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
       $this->add('text', 'title', ts('Event Name'), $attributes['event_title']);
     }
-    if (in_array('start_date', $this->_metadata[$mptype]['event_fields'])) {
+    if (in_array('start_date', $this->_metadata[$this->_mtype]['event_fields'])) {
       $this->addDateTime('start_date', ts('Start Date'), FALSE, array('formatType' => 'activityDateTime'));
     }
-    if (in_array('end_date', $this->_metadata[$mptype]['event_fields'])) {
+    if (in_array('end_date', $this->_metadata[$this->_mtype]['event_fields'])) {
       $this->addDateTime('end_date', ts('End Date / Time'), FALSE, array('formatType' => 'activityDateTime'));
     }
-    if (in_array('is_active', $this->_metadata[$mptype]['event_fields'])) {
+    if (in_array('is_active', $this->_metadata[$this->_mtype]['event_fields'])) {
       $this->addElement('checkbox', 'is_active', ts('Is this Event Active?'));
     }
 
     // custom handling
-    if (array_key_exists('custom', $this->_metadata[$mptype]['event_fields'])) {
+    if (array_key_exists('custom', $this->_metadata[$this->_mtype]['event_fields'])) {
       $this->set('type', 'Event');
       //FIXME: uncomment subType when we have event-type known
       //$this->set('subType', CRM_Utils_Array::value('event_type_id', $_POST));
@@ -108,7 +114,7 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
       CRM_Custom_Form_CustomData::preProcess($this);
       foreach ($this->_groupTree as $gID => &$grpVals) {
         foreach ($grpVals['fields'] as $fID => &$fldVals) {
-          if (!in_array($fldVals['label'], $this->_metadata[$mptype]['event_fields']['custom'])) {
+          if (!in_array($fldVals['label'], $this->_metadata[$this->_mtype]['event_fields']['custom'])) {
             unset($grpVals['fields'][$fID]);
           }
         }

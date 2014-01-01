@@ -47,7 +47,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
         'type'  => 'Event',
         'title' => 'Careers', 
         'event_fields' => array(
-          'type',
+          'type' => 'School Careers',
           'name',
           'start_date',
           'end_date',
@@ -64,7 +64,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
         'type'  => 'Event',
         'title' => 'Mentor', 
         'event_fields' => array(
-          'type',
+          'type' => 'School Mentoring',
           'name',
           'start_date',
           'end_date',
@@ -81,7 +81,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
         'type'  => 'Event',
         'title' => 'Work Experience', 
         'event_fields' => array(
-          'type',
+          'type' => 'School Work Experience',
           'name',
           'start_date',
           'end_date',
@@ -116,7 +116,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
         'type'  => 'Event',
         'title' => 'Non-Careers', 
         'event_fields' => array(
-          'type',
+          'type' => 'School Non-Careers',
           'name',
           'start_date',
           'end_date',
