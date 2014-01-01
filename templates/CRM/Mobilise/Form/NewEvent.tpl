@@ -61,6 +61,9 @@
     </tr>
     {/if}
   </table>
+  {if array_key_exists('custom', $event_fields)}
+    {include file="CRM/Custom/Form/CustomData.tpl"} 
+  {/if}
 
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
 </div>

@@ -97,6 +97,24 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
     if (in_array('is_active', $this->_metadata[$mptype]['event_fields'])) {
       $this->addElement('checkbox', 'is_active', ts('Is this Event Active?'));
     }
+
+    // custom handling
+    if (array_key_exists('custom', $this->_metadata[$mptype]['event_fields'])) {
+      $this->set('type', 'Event');
+      //FIXME: uncomment subType when we have event-type known
+      //$this->set('subType', CRM_Utils_Array::value('event_type_id', $_POST));
+      //$this->set('entityId', NULL);
+      $this->set('cgcount', 1);
+      CRM_Custom_Form_CustomData::preProcess($this);
+      foreach ($this->_groupTree as $gID => &$grpVals) {
+        foreach ($grpVals['fields'] as $fID => &$fldVals) {
+          if (!in_array($fldVals['label'], $this->_metadata[$mptype]['event_fields']['custom'])) {
+            unset($grpVals['fields'][$fID]);
+          }
+        }
+      }
+      CRM_Custom_Form_CustomData::buildQuickForm($this);
+    }
     parent::buildQuickForm();
   }
 
@@ -112,7 +130,6 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
     $params['is_active']  = CRM_Utils_Array::value('is_active', $params, 1);
 
     // custom handling
-    $customFlag = FALSE;
     $customFields = CRM_Core_BAO_CustomField::getFields('Event', FALSE, FALSE,
       CRM_Utils_Array::value('event_type_id', $params)
     );
@@ -123,17 +140,14 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
         $params["custom_{$cfID}_-1"] = "sample text"; 
         // its the following user id that will be considered as contact-ref-id
         $params["custom_{$cfID}_-1_id"] = $this->_currentUserId;
-        $customFlag = TRUE;
       }
     }
-    if ($customFlag) {
-      $entityID = NULL;
-      $params['custom'] = 
-        CRM_Core_BAO_CustomField::postProcess($params,
-          $customFields,
-          $entityID,
-          'Event');
-    }
+    $entityID = NULL;
+    $params['custom'] = 
+      CRM_Core_BAO_CustomField::postProcess($params,
+        $customFields,
+        $entityID,
+        'Event');
     $event = CRM_Event_BAO_Event::create($params);
     $this->set('event_id', $event->id);
   }

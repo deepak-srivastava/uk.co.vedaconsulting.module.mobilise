@@ -50,7 +50,8 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'type',
           'name',
           'start_date',
-          'end_date'
+          'end_date',
+          'custom' => array('Session Focus', 'Notes'),
         ),
         'participant_fields' => array(
           'role' => array('Staff Contact', 'Student Contact', 'Alumnus'),
@@ -66,7 +67,8 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'type',
           'name',
           'start_date',
-          'end_date'
+          'end_date',
+          'custom' => array('Notes'),
         ),
         'participant_fields' => array(
           'role' => array('Staff Contact', 'Student Contact', 'Alumnus'),
@@ -82,7 +84,8 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'type',
           'name',
           'start_date',
-          'end_date'
+          'end_date',
+          'custom' => array('Notes'),
         ),
         'participant_fields' => array(
           'role' => array('Staff Contact', 'Student Contact', 'Alumnus'),
@@ -116,7 +119,8 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'type',
           'name',
           'start_date',
-          'end_date'
+          'end_date',
+          'custom' => array('Notes'),
         ),
         'participant_fields' => array(
           'role' => array('Staff Contact', 'Student Contact', 'Alumnus'),
