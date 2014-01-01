@@ -139,6 +139,7 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
     $customFields = CRM_Core_BAO_CustomField::getFields('Event', FALSE, FALSE,
       CRM_Utils_Array::value('event_type_id', $params)
     );
+    // set host school custom field value
     foreach ($customFields as $cfID => $vals) {
       if ($vals['label'] == CRM_Mobilise_Form_Mobilise::SCHOOL_HOST_CUSTOM_FIELD_TITLE && 
         $vals['groupTitle'] == CRM_Mobilise_Form_Mobilise::SCHOOL_CUSTOM_SET_TITLE) {
@@ -148,12 +149,14 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
         $params["custom_{$cfID}_-1_id"] = $this->_currentUserId;
       }
     }
+    // format custom params
     $entityID = NULL;
     $params['custom'] = 
       CRM_Core_BAO_CustomField::postProcess($params,
         $customFields,
         $entityID,
         'Event');
+    // create event
     $event = CRM_Event_BAO_Event::create($params);
     $this->set('event_id', $event->id);
   }

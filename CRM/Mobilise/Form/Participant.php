@@ -49,6 +49,18 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
     $mptype = $this->get('mtype');
     $this->assign('participant_fields', $this->_metadata[$mptype]['participant_fields']);
 
+    $cidList = implode(",", $this->get('cids'));
+    $cidList = CRM_Utils_Type::escape($cidList, 'String');
+    $query   = "
+SELECT cc.id, cc.sort_name 
+FROM civicrm_contact cc
+WHERE cc.id IN ({$cidList})";
+    $dao     = CRM_Core_DAO::executeQuery($query);
+    $contacts = array();
+    while ($dao->fetch()) {
+      $contacts[$dao->id] = $dao->toArray();
+    }
+    $this->assign('contacts', $contacts);
     parent::preProcess();
   }
 

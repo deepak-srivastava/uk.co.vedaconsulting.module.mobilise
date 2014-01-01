@@ -57,6 +57,19 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
       CRM_Core_Error::fatal("Can't determine activity type.");
     }
 
+    $cidList = implode(",", $this->get('cids'));
+    $cidList = CRM_Utils_Type::escape($cidList, 'String');
+    $query   = "
+SELECT cc.id, cc.sort_name 
+FROM civicrm_contact cc
+WHERE cc.id IN ({$cidList})";
+    $dao     = CRM_Core_DAO::executeQuery($query);
+    $contacts = array();
+    while ($dao->fetch()) {
+      $contacts[$dao->id] = $dao->toArray();
+    }
+    $this->assign('contacts', $contacts);
+
     parent::preProcess();
   }
 
