@@ -54,10 +54,12 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'custom' => array('Session Focus', 'Notes'),
         ),
         'participant_fields' => array(
-          'role' => array('Staff Contact', 'Student Contact', 'Alumnus'),
+          'role' => array('Mentor'), // roles for alumni
           'register_date',
           'status',
-          'source'
+          'source',
+          'staff_contact'   => array('Staff Contact'), // roles for staff-contact
+          'student_contact' => array('Student Contact'), // roles for student-contact
         ),
       ),
       'mentor' => array( 
@@ -71,10 +73,12 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'custom' => array('Notes'),
         ),
         'participant_fields' => array(
-          'role' => array('Staff Contact', 'Student Contact', 'Alumnus'),
+          'role' => array('Mentor'), // roles for alumni
           'register_date',
           'status',
-          'source'
+          'source',
+          'staff_contact'   => array('Staff Contact'), // roles for staff-contact
+          'student_contact' => array('Attendee'), // roles for student-contact
         ),
       ),
       'work_exp' => array( 
@@ -88,10 +92,12 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'custom' => array('Notes'),
         ),
         'participant_fields' => array(
-          'role' => array('Staff Contact', 'Student Contact', 'Alumnus'),
+          'role' => array('Mentor'), // roles for alumni
           'register_date',
           'status',
-          'source'
+          'source',
+          'staff_contact'   => array('Staff Contact'), // roles for staff-contact
+          'student_contact' => array('Attendee'), // roles for student-contact
         ),
       ),
       'fundraising' => array( 
@@ -123,10 +129,11 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'custom' => array('Notes'),
         ),
         'participant_fields' => array(
-          'role' => array('Staff Contact', 'Student Contact', 'Alumnus'),
+          'role' => array(), // no predecided roles. user makes the choice
           'register_date',
           'status',
-          'source'
+          'source',
+          'staff_contact'   => array('Staff Contact'), // roles for staff-contact
         ),
       ),
       'others' => array( 
