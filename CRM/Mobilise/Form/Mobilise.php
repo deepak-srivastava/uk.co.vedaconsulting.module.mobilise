@@ -159,6 +159,12 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
     $session->pushUserContext(CRM_Utils_System::url('civicrm/report/instance/41', 'force=1'));
 
     $this->_currentUserId = $session->get('userID');
+
+    require_once 'CRM/Futurefirst/veda_FF_utils.php';
+    $this->_schoolId = CRM_Futurefirst_veda_FF_utils::get_teacher_school_ID();
+    if (!$this->_schoolId) {
+      CRM_Core_Error::fatal(ts("Can't find the school contact."));
+    }
   }
 
   function getMobiliseTypes() {

@@ -146,7 +146,7 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
         // since this is ref field. This text is not going to be taken. Its required for consideration.
         $params["custom_{$cfID}_-1"] = "sample text"; 
         // its the following user id that will be considered as contact-ref-id
-        $params["custom_{$cfID}_-1_id"] = $this->_currentUserId;
+        $params["custom_{$cfID}_-1_id"] = $this->_schoolId;
       }
     }
     // format custom params
