@@ -110,6 +110,13 @@ WHERE cc.id IN ({$cidList})";
     if (in_array('source', $this->_metadata[$mptype]['participant_fields'])) {
       $this->add('text', 'source', ts('Event Source'));
     }
+
+    $this->add('text', "contact[1]", ts('Staff Contact'), array('width' => '200px'), TRUE);
+    $this->addElement('hidden', "contact_select_id[1]");
+
+    $this->add('text', "contact[2]", ts('Student Contact'), array('width' => '200px'), TRUE);
+    $this->addElement('hidden', "contact_select_id[2]");
+
     parent::buildQuickForm();
   }
 
@@ -130,6 +137,23 @@ WHERE cc.id IN ({$cidList})";
             'version'       => 3,
           );
         $result = civicrm_api( 'participant','create',$params );
+      }
+    }
+    if (!empty($values['contact_select_id'])) {
+      foreach ($values['contact_select_id'] as $cid) {
+        if (CRM_Utils_Type::validate($cid, 'Integer')) {
+          $params = 
+            array( 
+              'contact_id'  => $cid,
+              'event_id'    => $this->get('event_id'),
+              'status_id'   => $values['status_id'],
+              'role_id'     => implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys($values['role_id'])),
+              'register_date' => CRM_Utils_Date::processDate($values['register_date'], $values['register_date_time']),
+              'source'        => $values['source'],
+              'version'       => 3,
+            );
+          $result = civicrm_api( 'participant','create',$params );
+        }
       }
     }
   }

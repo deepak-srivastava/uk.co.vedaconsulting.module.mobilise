@@ -62,6 +62,8 @@
 	    <span class="description">{ts}Source for this registration (if applicable).{/ts}</span></td>
 	</tr>
 	{/if}
+        {include file="CRM/Contact/Form/NewContact.tpl" blockNo=1}
+        {include file="CRM/Contact/Form/NewContact.tpl" blockNo=2}
       </table>
 
     </div><!-- /.crm-accordion-body -->
