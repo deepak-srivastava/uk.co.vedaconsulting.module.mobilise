@@ -58,8 +58,8 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'register_date',
           'status',
           'source',
-          'staff_contact'   => array('Staff Contact'), // roles for staff-contact
-          'student_contact' => array('Student Contact'), // roles for student-contact
+          'staff_contact'   => array('School Staff Contact'), // roles for staff-contact
+          'student_contact' => array('School Student Contact'), // roles for student-contact
         ),
       ),
       'mentor' => array( 
@@ -77,7 +77,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'register_date',
           'status',
           'source',
-          'staff_contact'   => array('Staff Contact'), // roles for staff-contact
+          'staff_contact'   => array('School Staff Contact'), // roles for staff-contact
           'student_contact' => array('Attendee'), // roles for student-contact
         ),
       ),
@@ -96,7 +96,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'register_date',
           'status',
           'source',
-          'staff_contact'   => array('Staff Contact'), // roles for staff-contact
+          'staff_contact'   => array('School Staff Contact'), // roles for staff-contact
           'student_contact' => array('Attendee'), // roles for student-contact
         ),
       ),
@@ -107,6 +107,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'activity_type',
           'activity_date',
           'status',
+          'custom' => array('Amount', 'Purpose'),
         ),
       ),
       'governor' => array( 
@@ -116,6 +117,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'activity_type',
           'activity_date',
           'status',
+          'custom' => array('Amount', 'Purpose'),
         ),
       ),
       'non_careers' => array( 
@@ -133,7 +135,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'register_date',
           'status',
           'source',
-          'staff_contact'   => array('Staff Contact'), // roles for staff-contact
+          'staff_contact'   => array('School Staff Contact'), // roles for staff-contact
         ),
       ),
       'others' => array( 
@@ -143,6 +145,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'activity_type',
           'activity_date',
           'status',
+          'custom' => array('Amount', 'Purpose'),
         ),
       ),
     );

@@ -55,6 +55,9 @@
 	</tr>
 	{/if}
       </table>
+      {if array_key_exists('custom', $activity_fields)}
+        {include file="CRM/Custom/Form/CustomData.tpl"} 
+      {/if}
 
     </div><!-- /.crm-accordion-body -->
   </div><!-- /.crm-accordion-wrapper -->

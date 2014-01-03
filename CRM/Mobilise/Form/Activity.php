@@ -65,11 +65,12 @@ class CRM_Mobilise_Form_Activity extends CRM_Mobilise_Form_Mobilise {
         'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
         'isDefault' => TRUE,
       ),
-      array('type' => 'next',
-        'name' => ts('New Activity'),
-        'subName' => 'newact',
-        'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
-      ),
+      //FIXME: New-activity workflow isn't going to stay
+      /* array('type' => 'next', */
+      /*   'name' => ts('New Activity'), */
+      /*   'subName' => 'newact', */
+      /*   'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;', */
+      /* ), */
       array(
         'type' => 'cancel',
         'name' => ts('Cancel'),

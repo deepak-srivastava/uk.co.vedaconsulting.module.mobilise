@@ -46,8 +46,8 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
    * @access public
    */
   public function preProcess() {
-    $mptype = $this->get('mtype');
-    $this->assign('activity_fields', $this->_metadata[$mptype]['activity_fields']);
+    $this->_mtype = $this->get('mtype');
+    $this->assign('activity_fields', $this->_metadata[$this->_mtype]['activity_fields']);
 
     $this->_activityTypeId = $this->get('activity_id');
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, TRUE);
@@ -95,13 +95,29 @@ WHERE cc.id IN ({$cidList})";
    * @access public
    */
   public function buildQuickForm() {
-    $mptype = $this->get('mtype');
-
-    if (in_array('activity_date', $this->_metadata[$mptype]['activity_fields'])) {
+    if (in_array('activity_date', $this->_metadata[$this->_mtype]['activity_fields'])) {
       $this->addDateTime('activity_date_time', ts('Date'), TRUE, array('formatType' => 'activityDateTime'));
     }
-    if (in_array('status', $this->_metadata[$mptype]['activity_fields'])) {
+    if (in_array('status', $this->_metadata[$this->_mtype]['activity_fields'])) {
       $this->add('select', 'status_id', ts('Status'), CRM_Core_PseudoConstant::activityStatus(), TRUE);
+    }
+
+    // custom handling
+    if (array_key_exists('custom', $this->_metadata[$this->_mtype]['activity_fields'])) {
+      $this->set('type', 'Activity');
+      //FIXME: uncomment subType when activity-type needs to be considered
+      $this->set('subType',  $this->_activityTypeId);
+      $this->set('entityId', NULL);
+      $this->set('cgcount',  1);
+      CRM_Custom_Form_CustomData::preProcess($this);
+      foreach ($this->_groupTree as $gID => &$grpVals) {
+        foreach ($grpVals['fields'] as $fID => &$fldVals) {
+          if (!in_array($fldVals['label'], $this->_metadata[$this->_mtype]['activity_fields']['custom'])) {
+            unset($grpVals['fields'][$fID]);
+          }
+        }
+      }
+      CRM_Custom_Form_CustomData::buildQuickForm($this);
     }
     parent::buildQuickForm();
   }
@@ -113,7 +129,23 @@ WHERE cc.id IN ({$cidList})";
     $params['activity_type_id']   = $this->_activityTypeId;
     $params['activity_date_time'] = CRM_Utils_Date::processDate(
       $params['activity_date_time'], $params['activity_date_time_time']);
-    
+
+    // custom params handling
+    if (array_key_exists('custom', $this->_metadata[$this->_mtype]['activity_fields'])) {
+      $customFields = CRM_Core_BAO_CustomField::getFields('Activity', FALSE, FALSE,$this->_activityTypeId);
+      $customFields = CRM_Utils_Array::crmArrayMerge(
+        $customFields,
+        CRM_Core_BAO_CustomField::getFields('Activity', FALSE, FALSE,NULL, NULL, TRUE));
+      
+      // format custom params
+      $entityID = NULL; // since its a create mode
+      $params['custom'] = 
+        CRM_Core_BAO_CustomField::postProcess($params,
+          $customFields,
+          $entityID,
+          'Activity');
+    }
+
     foreach ($this->get('cids') as $cid) {
       if (CRM_Utils_Type::validate($cid, 'Integer')) {
         $params['target_contact_id']  = array($cid);
