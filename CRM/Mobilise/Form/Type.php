@@ -66,7 +66,7 @@ class CRM_Mobilise_Form_Type extends CRM_Mobilise_Form_Mobilise {
    * @access public
    */
   public function buildQuickForm() {
-    $this->add('select', 'mobilise_type', ts('Mobilisation'), $this->getMobiliseTypes(), TRUE);
+    $this->add('select', 'mobilise_type', ts('Mobilisation Type'), $this->getMobilisationTypes(), TRUE);
 
     parent::buildQuickForm();
   }
@@ -75,8 +75,17 @@ class CRM_Mobilise_Form_Type extends CRM_Mobilise_Form_Mobilise {
     $values = $this->controller->exportValues($this->_name);
     $mType  = $values['mobilise_type'];
     $this->set('mtype', $mType);
-
+    
     $this->controller->set('workflow', strtolower($this->_metadata[$mType]['type']));
+
+    if ($this->_metadata[$mType]['type'] == 'Activity') {
+      $activityTypes = array_flip(CRM_Core_PseudoConstant::activityType());
+      if (!array_key_exists(ucfirst($mType), $activityTypes)) {
+        CRM_Core_Error::fatal(ts("Selected activity type '%1' doesn't exist. Make sure its configured.", array(1 => ucfirst($mType))));
+      } else {
+        $this->set('activity_id', $activityTypes[ucfirst($mType)]);
+      }
+    }
   }
 
   /**

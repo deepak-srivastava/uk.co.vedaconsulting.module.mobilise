@@ -125,9 +125,10 @@ WHERE cc.id IN ({$cidList})";
   public function postProcess() {
     $params  = $this->controller->exportValues($this->_name);
 
-    $params['source_contact_id']  = $this->_currentUserId;
-    $params['activity_type_id']   = $this->_activityTypeId;
-    $params['activity_date_time'] = CRM_Utils_Date::processDate(
+    $params['source_contact_id']   = $this->_schoolId;
+    $params['assignee_contact_id'] = array($this->_currentUserId);
+    $params['activity_type_id']    = $this->_activityTypeId;
+    $params['activity_date_time']  = CRM_Utils_Date::processDate(
       $params['activity_date_time'], $params['activity_date_time_time']);
 
     // custom params handling
@@ -146,12 +147,22 @@ WHERE cc.id IN ({$cidList})";
           'Activity');
     }
 
+    $count = 0;
     foreach ($this->get('cids') as $cid) {
       if (CRM_Utils_Type::validate($cid, 'Integer')) {
         $params['target_contact_id']  = array($cid);
         $activity = CRM_Activity_BAO_Activity::create($params);
+        if ($activity->id) {
+          $count++;
+        }
       }
     }
+    if ($count > 0) {
+      $statusMsg = ts('Mobilisations successfully created for selected alumnus.');
+    } else {
+      $statusMsg = ts('Could not create any mobilisations.');
+    }
+    $this->set('status', $statusMsg);
   }
 
   /**

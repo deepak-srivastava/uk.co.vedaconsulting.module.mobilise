@@ -26,5 +26,9 @@
 <div class="crm-block crm-form-block crm-mailing-group-form-block">
 {include file="CRM/common/WizardHeader.tpl"}
 
+<div class="messages status">
+{$message}
+</div>
+
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
 </div>

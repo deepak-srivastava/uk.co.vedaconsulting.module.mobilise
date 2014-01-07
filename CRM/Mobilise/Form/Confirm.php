@@ -47,6 +47,7 @@ class CRM_Mobilise_Form_Confirm extends CRM_Mobilise_Form_Mobilise {
    */
   public function preProcess() {
     parent::preProcess();
+    $this->assign('message', $this->get('status'));
   }
 
   /**
@@ -77,7 +78,11 @@ class CRM_Mobilise_Form_Confirm extends CRM_Mobilise_Form_Mobilise {
    * @return string
    */
   public function getTitle() {
-    return ts('In Progress..');
+    if ($this->controller->get('workflow')) {
+      return ts('Status');
+    } else {
+      return ts('In Progress..');
+    }
   }
 }
 

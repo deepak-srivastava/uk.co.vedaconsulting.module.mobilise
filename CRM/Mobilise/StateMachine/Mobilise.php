@@ -59,13 +59,9 @@ class CRM_Mobilise_StateMachine_Mobilise extends CRM_Core_StateMachine {
     if ($controller->get('workflow') == 'activity') {
       $this->_pages = array(
         'CRM_Mobilise_Form_Type'      => NULL,
-        'CRM_Mobilise_Form_Activity'  => NULL,
+        'CRM_Mobilise_Form_Target'    => NULL,
+	'CRM_Mobilise_Form_Confirm'   => NULL,
       );
-      if ($controller->get('is_new_activity')) {
-        $this->_pages['CRM_Mobilise_Form_NewActivity'] = NULL;
-      }
-      $this->_pages['CRM_Mobilise_Form_Target']  = NULL;
-      $this->_pages['CRM_Mobilise_Form_Confirm'] = NULL;
 
     } else if ($controller->get('workflow') == 'event') {
       $this->_pages = array(

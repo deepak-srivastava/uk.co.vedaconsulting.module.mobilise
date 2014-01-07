@@ -100,7 +100,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'student_contact' => array('Attendee'), // roles for student-contact
         ),
       ),
-      'fundraising' => array( 
+      'donation' => array( 
         'type'  => 'Activity',
         'title' => 'Donations / Fundraising', 
         'activity_fields' => array(
@@ -170,10 +170,12 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
     }
   }
 
-  function getMobiliseTypes() {
+  function getMobilisationTypes($types = array()) {
     $mobTypes = array();
     foreach ($this->_metadata as $key => $vals) {
-      $mobTypes[$key] = "{$vals['title']} ({$vals['type']})";
+      if (empty($types) || in_array($vals['type'], $types)) {
+        $mobTypes[$key] = $vals['title'];
+      }
     }
     return $mobTypes;
   }
