@@ -98,10 +98,9 @@ WHERE cc.id IN ({$cidList})";
     if (in_array('activity_date', $this->_metadata[$this->_mtype]['activity_fields'])) {
       $this->addDateTime('activity_date_time', ts('Date'), TRUE, array('formatType' => 'activityDateTime'));
     }
-    if (in_array('status', $this->_metadata[$this->_mtype]['activity_fields'])) {
-      $this->add('select', 'status_id', ts('Status'), CRM_Core_PseudoConstant::activityStatus(), TRUE);
+    if (in_array('notes', $this->_metadata[$this->_mtype]['activity_fields'])) {
+      $this->add('textarea', 'details', ts('Note'), 'rows=4, cols=60', TRUE);
     }
-
     // custom handling
     if (array_key_exists('custom', $this->_metadata[$this->_mtype]['activity_fields'])) {
       $this->set('type', 'Activity');
@@ -125,6 +124,7 @@ WHERE cc.id IN ({$cidList})";
   public function postProcess() {
     $params  = $this->controller->exportValues($this->_name);
 
+    $params['status_id']           = CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name');
     $params['source_contact_id']   = $this->_schoolId;
     $params['assignee_contact_id'] = array($this->_currentUserId);
     $params['activity_type_id']    = $this->_activityTypeId;

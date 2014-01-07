@@ -49,9 +49,9 @@
 	  {/if}
 	</tr>
 	{/if}
-	{if in_array('status', $activity_fields)}
+	{if in_array('notes', $activity_fields)}
 	<tr class="crm-mobilise-group-target-block-status_id">
-	  <td class="label">{$form.status_id.label}</td><td>{$form.status_id.html}</td>
+	  <td class="label">{$form.details.label}</td><td>{$form.details.html}</td>
 	</tr>
 	{/if}
       </table>
