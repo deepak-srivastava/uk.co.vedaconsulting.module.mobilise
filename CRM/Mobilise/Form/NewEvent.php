@@ -49,6 +49,9 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
     $this->_mtype = $this->get('mtype');
     $this->assign('event_fields', $this->_metadata[$this->_mtype]['event_fields']);
 
+    $eventTypes = array_flip(CRM_Core_OptionGroup::values('event_type'));
+    $this->_eventTypeId = CRM_Utils_Array::value($this->_metadata[$this->_mtype]['event_fields']['type'], $eventTypes);
+
     parent::preProcess();
   }
 
@@ -68,9 +71,9 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
       CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
     $defaults['is_active'] = 1;
 
-    $eventTypes = array_flip(CRM_Core_OptionGroup::values('event_type'));
-    $defaults['event_type_id'] = CRM_Utils_Array::value($this->_metadata[$this->_mtype]['event_fields']['type'], $eventTypes);
-
+    if ($this->_eventTypeId) {
+      $defaults['event_type_id'] = $this->_eventTypeId;
+    }
     return $defaults;
   }
 
@@ -86,7 +89,7 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
       $element    = 
         $this->add('select', 'event_type_id', ts('Event Type'),
           array('' => ts('- select -')) + $eventTypes, TRUE);
-      if (CRM_Utils_Array::value($this->_metadata[$this->_mtype]['event_fields']['type'], array_flip($eventTypes))) {
+      if ($this->_eventTypeId) {
         $element->freeze();
       }
     }
@@ -108,15 +111,18 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
     if (array_key_exists('custom', $this->_metadata[$this->_mtype]['event_fields'])) {
       $this->set('type', 'Event');
       //FIXME: uncomment subType when we have event-type known
-      //$this->set('subType', CRM_Utils_Array::value('event_type_id', $_POST));
-      //$this->set('entityId', NULL);
-      $this->set('cgcount', 1);
+      $this->set('subType',  $this->_eventTypeId);
+      $this->set('entityId', NULL);
+      $this->set('cgcount',  1);
       CRM_Custom_Form_CustomData::preProcess($this);
       foreach ($this->_groupTree as $gID => &$grpVals) {
         foreach ($grpVals['fields'] as $fID => &$fldVals) {
           if (!in_array($fldVals['label'], $this->_metadata[$this->_mtype]['event_fields']['custom'])) {
             unset($grpVals['fields'][$fID]);
           }
+        }
+        if (empty($grpVals['fields'])) {
+          unset($this->_groupTree[$gID]);
         }
       }
       CRM_Custom_Form_CustomData::buildQuickForm($this);
