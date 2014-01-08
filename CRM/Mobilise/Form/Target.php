@@ -96,11 +96,17 @@ WHERE cc.id IN ({$cidList})";
    */
   public function buildQuickForm() {
     if (in_array('activity_date', $this->_metadata[$this->_mtype]['activity_fields'])) {
-      $this->addDateTime('activity_date_time', ts('Date'), TRUE, array('formatType' => 'activityDateTime'));
+      if (array_key_exists('activity_end_date', $this->_metadata[$this->_mtype]['activity_fields'])) {
+        // don't add time if date range is expected
+        $this->addDate('activity_date_time', ts('Date From'), TRUE, array('formatType' => 'activityDate'));
+      } else {
+        $this->addDateTime('activity_date_time', ts('Date'), TRUE, array('formatType' => 'activityDateTime'));
+      }
     }
     if (in_array('notes', $this->_metadata[$this->_mtype]['activity_fields'])) {
       $this->add('textarea', 'details', ts('Note'), 'rows=4, cols=60', TRUE);
     }
+
     // custom handling
     if (array_key_exists('custom', $this->_metadata[$this->_mtype]['activity_fields'])) {
       $this->set('type', 'Activity');
@@ -114,9 +120,22 @@ WHERE cc.id IN ({$cidList})";
           if (!in_array($fldVals['label'], $this->_metadata[$this->_mtype]['activity_fields']['custom'])) {
             unset($grpVals['fields'][$fID]);
           }
+          if (array_key_exists('activity_end_date', $this->_metadata[$this->_mtype]['activity_fields'])) {
+            if ($fldVals['label'] == $this->_metadata[$this->_mtype]['activity_fields']['activity_end_date']) {
+              $dateCustomFieldID = $fID;
+              $dateCustomFieldLabel = $fldVals['label'];
+            } 
+          }
         }
       }
       CRM_Custom_Form_CustomData::buildQuickForm($this);
+    }
+
+    // add custom end date if configured in meta data
+    if (array_key_exists('activity_end_date', $this->_metadata[$this->_mtype]['activity_fields'])) {
+      $dateCustomFieldName = "custom_{$dateCustomFieldID}_-1";
+      $this->assign('customDate', $dateCustomFieldName);
+      $this->addDate($dateCustomFieldName, $dateCustomFieldLabel, TRUE, array('formatType' => 'activityDate'));
     }
     parent::buildQuickForm();
   }

@@ -107,7 +107,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'activity_type',
           'activity_date',
           'notes',
-          'custom' => array('Amount', 'Purpose'),
+          'custom' => array('Purpose'),
         ),
       ),
       'governor' => array( 
@@ -116,6 +116,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
         'activity_fields' => array(
           'activity_type',
           'activity_date',
+          'activity_end_date' => 'Till Date',
           'notes',
           'custom' => array('Amount', 'Purpose'),
         ),
