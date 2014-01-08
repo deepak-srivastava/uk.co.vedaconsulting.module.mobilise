@@ -86,7 +86,6 @@ class CRM_Mobilise_Form_Event extends CRM_Mobilise_Form_Mobilise {
       $values = $this->controller->exportValues($this->_name);
       $this->set('event_id', $values['event_id']);
     }
-    $this->controller->set('ignore_confirm', TRUE);
   }
 
   /**

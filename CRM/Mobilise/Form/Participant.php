@@ -49,19 +49,6 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
     $this->_mtype = $this->get('mtype');
     $this->assign('participant_fields', $this->_metadata[$this->_mtype]['participant_fields']);
 
-    $cidList = implode(",", $this->get('cids'));
-    $cidList = CRM_Utils_Type::escape($cidList, 'String');
-    $query   = "
-SELECT cc.id, cc.sort_name 
-FROM civicrm_contact cc
-WHERE cc.id IN ({$cidList})";
-    $dao     = CRM_Core_DAO::executeQuery($query);
-    $contacts = array();
-    while ($dao->fetch()) {
-      $contacts[$dao->id] = $dao->toArray();
-    }
-    $this->assign('contacts', $contacts);
-
     $rolesList = array_flip(CRM_Event_PseudoConstant::participantRole());
     $alumniRoles = $this->_metadata[$this->_mtype]['participant_fields']['role'];
     $this->_alumniRoleIDs = array();
@@ -175,6 +162,7 @@ WHERE cc.id IN ({$cidList})";
         $result = civicrm_api( 'participant','create',$params );
       }
     }
+    $count = 0;
     if (!empty($values['contact_select_id'])) {
       foreach ($values['contact_select_id'] as $key => $cid) {
         $roleIDs = ($key == 1) ? $this->_staffRoleIDs : ($key == 2 ? $this->_studentRoleIDs : array());
@@ -191,9 +179,18 @@ WHERE cc.id IN ({$cidList})";
               'version'       => 3,
             );
           $result = civicrm_api( 'participant','create',$params );
+          if (!$result['is_error'] && $result['count'] > 0) {
+            $count++;
+          }
         }
       }
     }
+    if ($count > 0) {
+      $statusMsg = ts('Mobilisations successfully created for selected alumnus.');
+    } else {
+      $statusMsg = ts('Could not create any mobilisations.');
+    }
+    $this->set('status', $statusMsg);
   }
 
   /**

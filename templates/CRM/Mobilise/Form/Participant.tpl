@@ -73,22 +73,5 @@
     </div><!-- /.crm-accordion-body -->
   </div><!-- /.crm-accordion-wrapper -->
 
-  <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-open">
-    <div class="crm-accordion-header">
-      <div class="icon crm-accordion-pointer"></div> 
-      {ts}Selected Alumni{/ts}
-    </div><!-- /.crm-accordion-header -->
-    <div class="crm-accordion-body">
-
-      <table>
-	{foreach from=$contacts item=contact}
-	<tr>
-	  <td>{$contact.sort_name}</td>
-	</tr>
-	{/foreach}
-      </table>
-
-    </div><!-- /.crm-accordion-body -->
-  </div><!-- /.crm-accordion-wrapper -->
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
 </div>

@@ -54,7 +54,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'custom' => array('Session Focus', 'Notes'),
         ),
         'participant_fields' => array(
-          'role' => array('Mentor'), // roles for alumni
+          'role' => array('Mentor (Alumni)'), // roles for alumni
           'register_date',
           'status',
           'source',
@@ -64,7 +64,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
       ),
       'mentor' => array( 
         'type'  => 'Event',
-        'title' => 'Mentor', 
+        'title' => 'Mentor (Alumni)', 
         'event_fields' => array(
           'type' => 'School Mentoring',
           'name',
@@ -73,7 +73,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'custom' => array('Notes'),
         ),
         'participant_fields' => array(
-          'role' => array('Mentor'), // roles for alumni
+          'role' => array('Mentor (Alumni)'), // roles for alumni
           'register_date',
           'status',
           'source',
@@ -92,7 +92,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'custom' => array('Notes'),
         ),
         'participant_fields' => array(
-          'role' => array('Mentor'), // roles for alumni
+          'role' => array('Mentor (Alumni)'), // roles for alumni
           'register_date',
           'status',
           'source',
