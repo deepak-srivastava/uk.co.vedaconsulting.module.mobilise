@@ -56,12 +56,6 @@
 	  <td class="label">{$form.status_id.label}</td><td>{$form.status_id.html}</td>
 	</tr>
 	{/if}
-	{if in_array('source', $participant_fields)}
-	<tr class="crm-mobilise-group-alumni-block-source">
-	  <td class="label">{$form.source.label}</td><td>{$form.source.html|crmReplace:class:huge}<br />
-	    <span class="description">{ts}Source for this registration (if applicable).{/ts}</span></td>
-	</tr>
-	{/if}
 	{if array_key_exists('staff_contact', $participant_fields)}
 	  {include file="CRM/Contact/Form/NewContact.tpl" blockNo=1}
 	{/if}

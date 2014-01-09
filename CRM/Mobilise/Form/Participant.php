@@ -75,10 +75,12 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
         $this->_studentRoleIDs[] = $roleID;
       }
     }
-    if (empty($this->_staffRoleIDs)) {
+    if (empty($this->_staffRoleIDs) && 
+	array_key_exists('staff_contact', $this->_metadata[$this->_mtype]['participant_fields'])) {
       CRM_Core_Error::fatal(ts('Staff Contact roles missing.'));
     }
-    if (empty($this->_studentRoleIDs)) {
+    if (empty($this->_studentRoleIDs) &&
+       array_key_exists('student_contact', $this->_metadata[$this->_mtype]['participant_fields'])) {
       CRM_Core_Error::fatal(ts('Student Contact roles missing.'));
     }
     parent::preProcess();
@@ -99,11 +101,6 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
     $defaults['role_id'] = array();
     foreach ($this->_alumniRoleIDs as $roleID) {
       $defaults['role_id'][$roleID] = 1;
-    }
-    if (!empty($defaults['role_id'])) {
-      foreach ($this->_roleTypes as $element) {
-        $element->freeze();
-      }
     }
     return $defaults;
   }
@@ -132,9 +129,6 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
       $status = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
       $this->add('select', 'status_id', ts('Participant Status'), 
         array('' => ts('- select -')) + $status, TRUE);
-    }
-    if (in_array('source', $this->_metadata[$this->_mtype]['participant_fields'])) {
-      $this->add('text', 'source', ts('Event Source'));
     }
     if (array_key_exists('staff_contact', $this->_metadata[$this->_mtype]['participant_fields'])) {
       $this->add('text', "contact[1]", ts('Staff Contact'), array('width' => '200px'), TRUE);
