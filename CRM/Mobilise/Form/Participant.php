@@ -49,6 +49,10 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
     $this->_mtype = $this->get('mtype');
     $this->assign('participant_fields', $this->_metadata[$this->_mtype]['participant_fields']);
 
+    if (!$this->get('event_id')) {
+      CRM_Core_Error::fatal(ts("Couldn't determine the Event."));
+    }
+
     $rolesList = array_flip(CRM_Event_PseudoConstant::participantRole());
     $alumniRoles = $this->_metadata[$this->_mtype]['participant_fields']['role'];
     $this->_alumniRoleIDs = array();

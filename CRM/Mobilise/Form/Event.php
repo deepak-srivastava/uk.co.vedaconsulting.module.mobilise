@@ -46,6 +46,10 @@ class CRM_Mobilise_Form_Event extends CRM_Mobilise_Form_Mobilise {
    * @access public
    */
   public function preProcess() {
+    $this->_mtype = $this->get('mtype');
+    $eventTypes   = array_flip(CRM_Core_OptionGroup::values('event_type'));
+    $this->_eventTypeId = CRM_Utils_Array::value($this->_metadata[$this->_mtype]['event_fields']['type'], $eventTypes);
+
     parent::preProcess();
   }
 
@@ -56,8 +60,12 @@ class CRM_Mobilise_Form_Event extends CRM_Mobilise_Form_Mobilise {
    * @access public
    */
   public function buildQuickForm() {
-    $events = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
-    $this->add('select', 'event_id', ts('Select Event'), $events, TRUE);
+    $condition = "( is_template IS NULL OR is_template != 1 )";
+    if ($this->_eventTypeId) {
+      $condition .= " AND event_type_id = $this->_eventTypeId";
+    }
+    $events  = CRM_Event_PseudoConstant::event(NULL, FALSE, $condition);
+    $element = $this->add('select', 'event_id', ts('Select Event'), array('' => ts('- select event -')) + $events, FALSE);
 
     $buttons = array(
       array('type' => 'next',
