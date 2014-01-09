@@ -61,23 +61,12 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
         $this->_alumniRoleIDs[] = $roleID;
       }
     }
-    $staffRoles = $this->_metadata[$this->_mtype]['participant_fields']['staff_contact'];
-    $this->_staffRoleIDs = array();
-    foreach ($staffRoles as $role) {
-      if ($roleID = CRM_Utils_Array::value($role, $rolesList)) {
-        $this->_staffRoleIDs[] = $roleID;
-      }
-    }
     $studentRoles = $this->_metadata[$this->_mtype]['participant_fields']['student_contact'];
     $this->_studentRoleIDs = array();
     foreach ($studentRoles as $role) {
       if ($roleID = CRM_Utils_Array::value($role, $rolesList)) {
         $this->_studentRoleIDs[] = $roleID;
       }
-    }
-    if (empty($this->_staffRoleIDs) && 
-	array_key_exists('staff_contact', $this->_metadata[$this->_mtype]['participant_fields'])) {
-      CRM_Core_Error::fatal(ts('Staff Contact roles missing.'));
     }
     if (empty($this->_studentRoleIDs) &&
        array_key_exists('student_contact', $this->_metadata[$this->_mtype]['participant_fields'])) {
@@ -130,13 +119,9 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
       $this->add('select', 'status_id', ts('Participant Status'), 
         array('' => ts('- select -')) + $status, TRUE);
     }
-    if (array_key_exists('staff_contact', $this->_metadata[$this->_mtype]['participant_fields'])) {
-      $this->add('text', "contact[1]", ts('Staff Contact'), array('width' => '200px'), TRUE);
-      $this->addElement('hidden', "contact_select_id[1]");
-    }
     if (array_key_exists('student_contact', $this->_metadata[$this->_mtype]['participant_fields'])) {
-      $this->add('text', "contact[2]", ts('Student Contact'), array('width' => '200px'), TRUE);
-      $this->addElement('hidden', "contact_select_id[2]");
+      $this->add('text', "contact[1]", ts('Student Contact'), array('width' => '200px'), TRUE);
+      $this->addElement('hidden', "contact_select_id[1]");
     }
     parent::buildQuickForm();
   }
@@ -144,6 +129,7 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
   public function postProcess() {
     require_once 'api/api.php';
     $values = $this->controller->exportValues($this->_name);
+    $count  = 0;
 
     foreach ($this->get('cids') as $cid) {
       if (CRM_Utils_Type::validate($cid, 'Integer')) {
@@ -157,13 +143,15 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
             'source'        => $values['source'],
             'version'       => 3,
           );
-        $result = civicrm_api( 'participant','create',$params );
+        $result = civicrm_api( 'participant','create', $params );
+	if (!$result['is_error'] && $result['count'] > 0) {
+            $count++;
+	}
       }
     }
-    $count = 0;
     if (!empty($values['contact_select_id'])) {
       foreach ($values['contact_select_id'] as $key => $cid) {
-        $roleIDs = ($key == 1) ? $this->_staffRoleIDs : ($key == 2 ? $this->_studentRoleIDs : array());
+        $roleIDs = ($key == 1) ? $this->_studentRoleIDs : array();
         $roleIDs = implode(CRM_Core_DAO::VALUE_SEPARATOR, $roleIDs);
         if (!empty($roleIDs) && CRM_Utils_Type::validate($cid, 'Integer')) {
           $params = 
@@ -176,7 +164,7 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
               'source'        => $values['source'],
               'version'       => 3,
             );
-          $result = civicrm_api( 'participant','create',$params );
+          $result = civicrm_api( 'participant','create', $params );
           if (!$result['is_error'] && $result['count'] > 0) {
             $count++;
           }

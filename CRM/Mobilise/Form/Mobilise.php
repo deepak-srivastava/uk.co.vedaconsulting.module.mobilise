@@ -51,13 +51,12 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'name',
           'start_date',
           'end_date',
-          'custom' => array('Session Focus', 'Notes'),
+          'custom' => array('School Staff Contact', 'Session Focus', 'Notes'),
         ),
         'participant_fields' => array(
           'role' => array('Speaker'), // roles for alumni
           'register_date',
           'status',
-          'staff_contact'   => array('School Staff Contact'), // roles for staff-contact
           'student_contact' => array('School Student Contact'), // roles for student-contact
         ),
       ),
@@ -69,13 +68,12 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'name',
           'start_date',
           'end_date',
-          'custom' => array('Notes'),
+          'custom' => array('School Staff Contact', 'Notes'),
         ),
         'participant_fields' => array(
           'role' => array('Mentor (Alumni)'), // roles for alumni
           'register_date',
           'status',
-          'staff_contact'   => array('School Staff Contact'), // roles for staff-contact
           'student_contact' => array('Attendee'), // roles for student-contact
         ),
       ),
@@ -87,13 +85,12 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'name',
           'start_date',
           'end_date',
-          'custom' => array('Notes'),
+          'custom' => array('School Staff Contact', 'Notes'),
         ),
         'participant_fields' => array(
           'role' => array('Mentor (Alumni)'), // roles for alumni
           'register_date',
           'status',
-          'staff_contact'   => array('School Staff Contact'), // roles for staff-contact
           'student_contact' => array('Attendee'), // roles for student-contact
         ),
       ),
@@ -126,13 +123,12 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'name',
           'start_date',
           'end_date',
-          'custom' => array('Notes'),
+          'custom' => array('School Staff Contact', 'Notes'),
         ),
         'participant_fields' => array(
           'role' => array(), // no predecided roles. user makes the choice
           'register_date',
           'status',
-          'staff_contact'   => array('School Staff Contact'), // roles for staff-contact
         ),
       ),
       'other' => array( 

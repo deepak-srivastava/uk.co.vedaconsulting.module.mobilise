@@ -56,11 +56,8 @@
 	  <td class="label">{$form.status_id.label}</td><td>{$form.status_id.html}</td>
 	</tr>
 	{/if}
-	{if array_key_exists('staff_contact', $participant_fields)}
-	  {include file="CRM/Contact/Form/NewContact.tpl" blockNo=1}
-	{/if}
 	{if array_key_exists('student_contact', $participant_fields)}
-          {include file="CRM/Contact/Form/NewContact.tpl" blockNo=2}
+          {include file="CRM/Contact/Form/NewContact.tpl" blockNo=1}
 	{/if}
       </table>
 
