@@ -63,7 +63,7 @@
 	{/if}
       </table>
       {if array_key_exists('custom', $event_fields)}
-        {include file="CRM/Override/Form/CustomData.tpl"} 
+        {include file="CRM/Mobilise/Override/CustomData.tpl"} 
       {/if}
 
     </div><!-- /.crm-accordion-body -->

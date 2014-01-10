@@ -61,7 +61,7 @@
 	{/if}
       </table>
       {if array_key_exists('custom', $activity_fields)}
-        {include file="CRM/Override/Form/CustomData.tpl"} 
+        {include file="CRM/Mobilise/Override/CustomData.tpl"} 
       {/if}
       <table class="form-layout-compressed">
 	{if in_array('notes', $activity_fields)}
