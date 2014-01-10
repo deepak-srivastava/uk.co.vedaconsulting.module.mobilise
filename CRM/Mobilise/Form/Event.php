@@ -60,11 +60,23 @@ class CRM_Mobilise_Form_Event extends CRM_Mobilise_Form_Mobilise {
    * @access public
    */
   public function buildQuickForm() {
-    $condition = "( is_template IS NULL OR is_template != 1 )";
+    $schoolTable  = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', CRM_Mobilise_Form_Mobilise::SCHOOL_CUSTOM_SET_TITLE, 'table_name', 'title');
+    $schoolColumn = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', CRM_Mobilise_Form_Mobilise::SCHOOL_HOST_CUSTOM_FIELD_TITLE, 'column_name', 'label');
+    $condition    = "( is_template IS NULL OR is_template != 1 )";
     if ($this->_eventTypeId) {
-      $condition .= " AND event_type_id = $this->_eventTypeId";
+	$condition .= " AND event_type_id = {$this->_eventTypeId}";
     }
-    $events  = CRM_Event_PseudoConstant::event(NULL, FALSE, $condition);
+
+    $events = array();
+    $query  = "
+SELECT e.id, e.title
+ FROM civicrm_event e
+INNER JOIN $schoolTable s ON s.entity_id = e.id
+WHERE s.{$schoolColumn} = %1 AND {$condition}";
+    $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($this->_schoolId, 'Integer')));
+    while ($dao->fetch()) {
+	$events[$dao->id] = $dao->title;
+    }
     $element = $this->add('select', 'event_id', ts('Select Event'), array('' => ts('- select event -')) + $events, FALSE);
 
     $buttons = array(
