@@ -59,15 +59,17 @@
 	  {/if}
 	</tr>
 	{/if}
+      </table>
+      {if array_key_exists('custom', $activity_fields)}
+        {include file="CRM/Custom/Form/CustomData.tpl"} 
+      {/if}
+      <table class="form-layout-compressed">
 	{if in_array('notes', $activity_fields)}
 	<tr class="crm-mobilise-group-target-block-status_id">
 	  <td class="label">{$form.details.label}</td><td>{$form.details.html}</td>
 	</tr>
 	{/if}
       </table>
-      {if array_key_exists('custom', $activity_fields)}
-        {include file="CRM/Custom/Form/CustomData.tpl"} 
-      {/if}
 
     </div><!-- /.crm-accordion-body -->
   </div><!-- /.crm-accordion-wrapper -->

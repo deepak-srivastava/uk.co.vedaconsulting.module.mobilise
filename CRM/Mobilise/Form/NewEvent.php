@@ -103,9 +103,6 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
     if (in_array('end_date', $this->_metadata[$this->_mtype]['event_fields'])) {
       $this->addDateTime('end_date', ts('End Date / Time'), FALSE, array('formatType' => 'activityDateTime'));
     }
-    if (in_array('is_active', $this->_metadata[$this->_mtype]['event_fields'])) {
-      $this->addElement('checkbox', 'is_active', ts('Is this Event Active?'));
-    }
 
     // custom handling
     if (array_key_exists('custom', $this->_metadata[$this->_mtype]['event_fields'])) {

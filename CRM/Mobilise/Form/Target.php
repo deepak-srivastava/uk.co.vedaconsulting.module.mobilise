@@ -91,7 +91,7 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
       }
     }
     if (in_array('notes', $this->_metadata[$this->_mtype]['activity_fields'])) {
-      $this->add('textarea', 'details', ts('Note'), 'rows=4, cols=60', TRUE);
+      $this->add('textarea', 'details', ts('Note'), 'rows=3, cols=60', TRUE);
     }
 
     // custom handling
@@ -119,7 +119,8 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
     }
 
     // add custom end date if configured in meta data
-    if (array_key_exists('activity_end_date', $this->_metadata[$this->_mtype]['activity_fields'])) {
+    if (array_key_exists('custom', $this->_metadata[$this->_mtype]['activity_fields']) &&
+      array_key_exists('activity_end_date', $this->_metadata[$this->_mtype]['activity_fields'])) {
       $dateCustomFieldName = "custom_{$dateCustomFieldID}_-1";
       $this->assign('customDate', $dateCustomFieldName);
       $this->addDate($dateCustomFieldName, $dateCustomFieldLabel, TRUE, array('formatType' => 'activityDate'));
