@@ -57,7 +57,7 @@
 	</tr>
 	{/if}
 	{if array_key_exists('student_contact', $participant_fields)}
-          {include file="CRM/Contact/Form/NewContact.tpl" blockNo=1}
+          {include file="CRM/Mobilise/Override/NewContact.tpl" blockNo=1}
 	{/if}
       </table>
 

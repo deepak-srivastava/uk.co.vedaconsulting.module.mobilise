@@ -68,3 +68,18 @@ function mobilise_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
 function mobilise_civicrm_managed(&$entities) {
   return _mobilise_civix_civicrm_managed($entities);
 }
+
+function mobilise_civicrm_contactListQuery(&$query, $name, $context, $id) {
+  if ($context == 'mobiliseGetStudentList') {
+    $id = CRM_Utils_Type::escape($id, 'Integer');
+    $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'School is', 'id', 'name_a_b');
+    $query = "
+    SELECT cc.id, cc.sort_name, CONCAT_WS(' :: ', cc.sort_name, eml.email) as data
+      FROM civicrm_contact cc 
+ LEFT JOIN civicrm_email eml ON ( cc.id = eml.contact_id AND eml.is_primary = 1 )
+INNER JOIN civicrm_relationship rel ON rel.contact_id_a = cc.id AND rel.contact_id_b = {$id} AND rel.relationship_type_id = {$relTypeId}
+     WHERE cc.sort_name LIKE '$name%' AND cc.is_deleted = 0
+  ORDER BY cc.sort_name 
+  LIMIT 0, 10";
+  }
+}

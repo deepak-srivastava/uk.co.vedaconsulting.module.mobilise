@@ -160,6 +160,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
     if (!$this->_schoolId) {
       CRM_Core_Error::fatal(ts("Can't find the school contact."));
     }
+    $this->assign('schoolId', $this->_schoolId);
   }
 
   function getMobilisationTypes($types = array()) {
