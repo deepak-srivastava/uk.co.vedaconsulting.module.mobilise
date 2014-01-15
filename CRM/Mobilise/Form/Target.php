@@ -121,11 +121,38 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
     // add custom end date if configured in meta data
     if (array_key_exists('custom', $this->_metadata[$this->_mtype]['activity_fields']) &&
       array_key_exists('activity_end_date', $this->_metadata[$this->_mtype]['activity_fields'])) {
-      $dateCustomFieldName = "custom_{$dateCustomFieldID}_-1";
-      $this->assign('customDate', $dateCustomFieldName);
-      $this->addDate($dateCustomFieldName, $dateCustomFieldLabel, TRUE, array('formatType' => 'activityDate'));
+      $this->_dateCustomFieldName = "custom_{$dateCustomFieldID}_-1";
+      $this->assign('customDate', $this->_dateCustomFieldName);
+      $this->addDate($this->_dateCustomFieldName, $dateCustomFieldLabel, TRUE, array('formatType' => 'activityDate'));
     }
     parent::buildQuickForm();
+
+    if (array_key_exists('activity_end_date', $this->_metadata[$this->_mtype]['activity_fields'])) {
+      $this->addFormRule(array('CRM_Mobilise_Form_Target', 'formRule'), $this);
+    }
+  }
+
+  /**
+   * global form rule
+   *
+   * @param array $fields  the input form values
+   * @param array $files   the uploaded files if any
+   * @param array $options additional user data
+   *
+   * @return true if no errors, else array of errors
+   * @access public
+   * @static
+   */
+  static function formRule($fields, $files, $self) {
+    $errors = array();
+
+    $fromDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('activity_date_time', $fields));
+    $endDate  = CRM_Utils_Date::processDate(CRM_Utils_Array::value($self->_dateCustomFieldName, $fields));
+    if ($endDate < $fromDate) {
+      $errors[$self->_dateCustomFieldName] = ts("Till date can't be earlier than the From Date.");
+    }
+
+    return $errors;
   }
 
   public function postProcess() {

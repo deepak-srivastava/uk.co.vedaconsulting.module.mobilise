@@ -31,25 +31,13 @@
   <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-open">
     <div class="crm-accordion-header">
       <div class="icon crm-accordion-pointer"></div> 
-      {ts}Alumni Details{/ts}
+      {ts}Assignment Details{/ts}
     </div><!-- /.crm-accordion-header -->
     <div class="crm-accordion-body">
 
       <table class="form-layout-compressed">
 	{if array_key_exists('role', $participant_fields)}
 	<tr class="crm-mobilise-group-alumni-block-role_id"><td class="label">{$form.role_id.label}</td><td>{$form.role_id.html}</td></tr>
-	{/if}
-	{if in_array('register_date', $participant_fields)}
-	<tr class="crm-mobilise-group-alumni-block-register_date">
-	  <td class="label">{$form.register_date.label}</td>
-	  <td>
-	    {if $hideCalendar neq true}
-	      {include file="CRM/common/jcalendar.tpl" elementName=register_date}
-	    {else}
-	      {$form.register_date.html|crmDate}
-	    {/if}
-	  </td>
-	</tr>
 	{/if}
 	{if in_array('status', $participant_fields)}
 	<tr class="crm-mobilise-group-alumni-block-status_id">

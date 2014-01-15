@@ -85,7 +85,6 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
    */
   public function setDefaultValues() {
     $defaults = array();
-    list($defaults['register_date'], $defaults['register_date_time']) = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
 
     $defaults['role_id'] = array();
     foreach ($this->_alumniRoleIDs as $roleID) {
@@ -111,9 +110,6 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
       $this->addGroup($this->_roleTypes, 'role_id', ts('Alumni Role'));
       $this->addRule('role_id', ts('Role is required'), 'required');
     }
-    if (in_array('register_date', $this->_metadata[$this->_mtype]['participant_fields'])) {
-      $this->addDateTime('register_date', ts('Registration Date'), TRUE, array('formatType' => 'activityDateTime'));
-    }
     if (in_array('status', $this->_metadata[$this->_mtype]['participant_fields'])) {
       $status = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
       $this->add('select', 'status_id', ts('Alumni Status'), 
@@ -130,6 +126,7 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
     require_once 'api/api.php';
     $values = $this->controller->exportValues($this->_name);
     $count  = 0;
+    $now    = date('YmdHis');
 
     foreach ($this->get('cids') as $cid) {
       if (CRM_Utils_Type::validate($cid, 'Integer')) {
@@ -139,7 +136,7 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
             'event_id'    => $this->get('event_id'),
             'status_id'   => $values['status_id'],
             'role_id'     => implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys($values['role_id'])),
-            'register_date' => CRM_Utils_Date::processDate($values['register_date'], $values['register_date_time']),
+            'register_date' => $now,
             'source'        => $values['source'],
             'version'       => 3,
           );
@@ -160,7 +157,7 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
               'event_id'    => $this->get('event_id'),
               'status_id'   => $values['status_id'],
               'role_id'     => $roleIDs,
-              'register_date' => CRM_Utils_Date::processDate($values['register_date'], $values['register_date_time']),
+              'register_date' => $now,
               'source'        => $values['source'],
               'version'       => 3,
             );

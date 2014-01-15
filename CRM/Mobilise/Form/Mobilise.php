@@ -55,7 +55,6 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
         ),
         'participant_fields' => array(
           'role' => array('Speaker'), // roles for alumni
-          'register_date',
           'status',
           'student_contact' => array('School Student Contact'), // roles for student-contact
         ),
@@ -72,7 +71,6 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
         ),
         'participant_fields' => array(
           'role' => array('Mentor (Alumni)'), // roles for alumni
-          'register_date',
           'status',
           'student_contact' => array('Attendee'), // roles for student-contact
         ),
@@ -89,7 +87,6 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
         ),
         'participant_fields' => array(
           'role' => array('Mentor (Alumni)'), // roles for alumni
-          'register_date',
           'status',
           'student_contact' => array('Attendee'), // roles for student-contact
         ),
@@ -127,7 +124,6 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
         ),
         'participant_fields' => array(
           'role' => array(), // no predecided roles. user makes the choice
-          'register_date',
           'status',
         ),
       ),
