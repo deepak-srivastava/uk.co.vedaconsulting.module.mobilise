@@ -91,7 +91,7 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
       }
     }
     if (in_array('notes', $this->_metadata[$this->_mtype]['activity_fields'])) {
-      $this->add('textarea', 'details', ts('Note'), 'rows=3, cols=60', TRUE);
+      $this->add('textarea', 'details', ts('Notes'), 'rows=3, cols=60', TRUE);
     }
 
     // custom handling
@@ -165,7 +165,7 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
       }
     }
     if ($count > 0) {
-      $statusMsg = ts('Mobilisations successfully created for selected alumnus.');
+      $statusMsg = ts('Mobilisation successfully created for the selected alumni.');
     } else {
       $statusMsg = ts('Could not create any mobilisations.');
     }

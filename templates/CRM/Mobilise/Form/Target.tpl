@@ -31,7 +31,7 @@
   <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-open">
     <div class="crm-accordion-header">
       <div class="icon crm-accordion-pointer"></div> 
-      {ts}Activity Fields{/ts}
+      {ts}Alumni Details{/ts}
     </div><!-- /.crm-accordion-header -->
     <div class="crm-accordion-body">
 

@@ -137,7 +137,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
         'activity_fields' => array(
           'activity_type',
           'activity_date',
-          'custom' => array('Amount', 'Purpose'),
+          'notes',
         ),
       ),
     );

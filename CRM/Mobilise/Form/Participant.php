@@ -108,7 +108,7 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
         $this->_roleTypes[] = 
           $this->createElement('checkbox', $rolekey, NULL, $rolevalue);
       }
-      $this->addGroup($this->_roleTypes, 'role_id', ts('Participant Role'));
+      $this->addGroup($this->_roleTypes, 'role_id', ts('Alumni Role'));
       $this->addRule('role_id', ts('Role is required'), 'required');
     }
     if (in_array('register_date', $this->_metadata[$this->_mtype]['participant_fields'])) {
@@ -116,7 +116,7 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
     }
     if (in_array('status', $this->_metadata[$this->_mtype]['participant_fields'])) {
       $status = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
-      $this->add('select', 'status_id', ts('Participant Status'), 
+      $this->add('select', 'status_id', ts('Alumni Status'), 
         array('' => ts('- select -')) + $status, TRUE);
     }
     if (array_key_exists('student_contact', $this->_metadata[$this->_mtype]['participant_fields'])) {
@@ -172,7 +172,7 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
       }
     }
     if ($count > 0) {
-      $statusMsg = ts('Mobilisations successfully created for selected alumnus.');
+      $statusMsg = ts('Mobilisation successfully created for the selected alumni.');
     } else {
       $statusMsg = ts('Could not create any mobilisations.');
     }
