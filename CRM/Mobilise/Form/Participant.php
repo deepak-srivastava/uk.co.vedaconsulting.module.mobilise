@@ -112,6 +112,12 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
     }
     if (in_array('status', $this->_metadata[$this->_mtype]['participant_fields'])) {
       $status = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
+      foreach ($status as $id => $label) {
+        if (in_array(strtolower($label), 
+            array("pending from pay later", "pending from incomplete transaction", "pending in cart"))) {
+          unset($status[$id]);
+        }
+      }
       $this->add('select', 'status_id', ts('Alumni Status'), 
         array('' => ts('- select -')) + $status, TRUE);
     }

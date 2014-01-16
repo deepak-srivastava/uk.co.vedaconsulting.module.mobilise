@@ -66,9 +66,8 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
   function setDefaultValues() {
     $defaults = array();
 
-    list($defaults['start_date'], 
-      $defaults['start_date_time']) = 
-      CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
+    list($defaults['start_date']) = 
+      CRM_Utils_Date::setDateDefaults(NULL, 'activityDate');
     $defaults['is_active'] = 1;
 
     if ($this->_eventTypeId) {
@@ -95,13 +94,13 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
     }
     if (in_array('name', $this->_metadata[$this->_mtype]['event_fields'])) {
       $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
-      $this->add('text', 'title', ts('Event Name'), $attributes['event_title']);
+      $this->add('text', 'title', ts('Event Name'), $attributes['event_title'], TRUE);
     }
     if (in_array('start_date', $this->_metadata[$this->_mtype]['event_fields'])) {
-      $this->addDateTime('start_date', ts('Start Date'), FALSE, array('formatType' => 'activityDateTime'));
+      $this->addDate('start_date', ts('Start Date'), TRUE, array('formatType' => 'activityDate'));
     }
     if (in_array('end_date', $this->_metadata[$this->_mtype]['event_fields'])) {
-      $this->addDateTime('end_date', ts('End Date / Time'), FALSE, array('formatType' => 'activityDateTime'));
+      $this->addDate('end_date', ts('End Date'), FALSE, array('formatType' => 'activityDate'));
     }
 
     // custom handling
@@ -125,17 +124,41 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
       CRM_Custom_Form_CustomData::buildQuickForm($this);
     }
     parent::buildQuickForm();
+    
+    $this->addFormRule(array('CRM_Mobilise_Form_NewEvent', 'formRule'), $this);
+  }
+
+  /**
+   * global form rule
+   *
+   * @param array $fields  the input form values
+   * @param array $files   the uploaded files if any
+   * @param array $options additional user data
+   *
+   * @return true if no errors, else array of errors
+   * @access public
+   * @static
+   */
+  static function formRule($fields, $files, $self) {
+    $errors = array();
+
+    if ($endDate = CRM_Utils_Array::value('end_date', $fields)) {
+      $fromDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('start_date', $fields));
+      $endDate  = CRM_Utils_Date::processDate($endDate);
+      if ($endDate < $fromDate) {
+        $errors['end_date'] = ts("End Date can't be earlier than the Start Date.");
+      }
+    }
+
+    return $errors;
   }
 
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
 
     //format params
-    $params['start_date'] = CRM_Utils_Date::processDate($params['start_date'], $params['start_date_time']);
-    $params['end_date']   = CRM_Utils_Date::processDate(CRM_Utils_Array::value('end_date', $params),
-      CRM_Utils_Array::value('end_date_time', $params),
-      TRUE
-    );
+    $params['start_date'] = CRM_Utils_Date::processDate($params['start_date']);
+    $params['end_date']   = CRM_Utils_Date::processDate(CRM_Utils_Array::value('end_date', $params), '235959', TRUE);
     $params['is_active']  = CRM_Utils_Array::value('is_active', $params, 1);
 
     // custom handling

@@ -50,13 +50,11 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'type' => 'School Careers',
           'name',
           'start_date',
-          'end_date',
           'custom' => array('School Staff Contact', 'Session Focus', 'Notes'),
         ),
         'participant_fields' => array(
           'role' => array('Speaker'), // roles for alumni
           'status',
-          'student_contact' => array('School Student Contact'), // roles for student-contact
         ),
       ),
       'mentor' => array( 
