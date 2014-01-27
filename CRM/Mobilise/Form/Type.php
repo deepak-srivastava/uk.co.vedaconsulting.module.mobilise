@@ -46,6 +46,8 @@ class CRM_Mobilise_Form_Type extends CRM_Mobilise_Form_Mobilise {
    * @access public
    */
   public function preProcess() {
+    parent::preProcess();
+
     $cids = CRM_Utils_Array::value('cids', $_REQUEST);
     if (empty($cids)) {
       $cids = $this->get('cids');
@@ -53,10 +55,28 @@ class CRM_Mobilise_Form_Type extends CRM_Mobilise_Form_Mobilise {
       $this->set('cids', $cids);
     }
 
-    if (empty($cids)) {
+    if (!$this->_id && empty($cids)) {
       CRM_Core_Error::fatal(ts("Could not find valid contact ids"));
     }
-    parent::preProcess();
+  }
+
+  /**
+   * This function sets the default values for the form in edit/view mode
+   * the default values are retrieved from the database
+   *
+   * @access public
+   *
+   * @return None
+   */
+  public function setDefaultValues() {
+    $defaults = array();
+
+    if ($this->_id) {
+      $activityTypes = CRM_Core_PseudoConstant::activityType();
+      $this->_activityTypeID = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $this->_id, 'activity_type_id');
+      $defaults['mobilise_type'] = $activityTypes[$this->_activityTypeID];
+    }
+    return $defaults;
   }
 
   /**
@@ -66,26 +86,35 @@ class CRM_Mobilise_Form_Type extends CRM_Mobilise_Form_Mobilise {
    * @access public
    */
   public function buildQuickForm() {
-    $this->add('select', 'mobilise_type', ts('Mobilisation Type'), $this->getMobilisationTypes(), TRUE);
-
+    $mobType = $this->add('select', 'mobilise_type', ts('Mobilisation Type'), $this->getMobilisationTypes(), TRUE);
+    if ($this->_id) {
+    	$mobType->freeze();
+    }
     parent::buildQuickForm();
   }
 
   public function postProcess() {
-    $values = $this->controller->exportValues($this->_name);
-    $mType  = $values['mobilise_type'];
-    $this->set('mtype', $mType);
-    
-    $this->controller->set('workflow', strtolower($this->_metadata[$mType]['type']));
+    if ($this->_id) {
+      $activityTypeID = $this->_activityTypeID;
+      $sourceRecID    = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $this->_id, 'source_record_id');
+      $workflow = $sourceRecID ? 'event' : 'activity';
 
-    if ($this->_metadata[$mType]['type'] == 'Activity') {
+      $activityTypes = CRM_Core_PseudoConstant::activityType();
+      $mType = $activityTypes[$activityTypeID];
+    } else {
+      $values = $this->controller->exportValues($this->_name);
+      $mType  = $values['mobilise_type'];
+      $workflow = strtolower($this->_metadata[$mType]['type']);
+
       $activityTypes = array_flip(CRM_Core_PseudoConstant::activityType());
-      if (!array_key_exists(ucfirst($mType), $activityTypes)) {
-        CRM_Core_Error::fatal(ts("Selected activity type '%1' doesn't exist. Make sure its configured.", array(1 => ucfirst($mType))));
-      } else {
-        $this->set('activity_id', $activityTypes[ucfirst($mType)]);
+      if (!array_key_exists($mType, $activityTypes)) {
+        CRM_Core_Error::fatal(ts("Selected activity type '%1' doesn't exist. Make sure its configured.", array(1 => $mType)));
       }
+      $activityTypeID = $activityTypes[$mType];
     }
+    $this->controller->set('workflow', $workflow);
+    $this->set('activity_type_id', $activityTypeID);
+    $this->set('mtype', $mType);
   }
 
   /**

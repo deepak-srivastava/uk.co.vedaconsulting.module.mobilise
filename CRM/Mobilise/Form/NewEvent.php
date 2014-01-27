@@ -46,13 +46,12 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
    * @access public
    */
   public function preProcess() {
-    $this->_mtype = $this->get('mtype');
+    parent::preProcess();
+
     $this->assign('event_fields', $this->_metadata[$this->_mtype]['event_fields']);
 
     $eventTypes = array_flip(CRM_Core_OptionGroup::values('event_type'));
     $this->_eventTypeId = CRM_Utils_Array::value($this->_metadata[$this->_mtype]['event_fields']['type'], $eventTypes);
-
-    parent::preProcess();
   }
 
   /**

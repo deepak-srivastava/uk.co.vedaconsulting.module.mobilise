@@ -43,7 +43,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
 
   protected $_metadata = 
     array(
-      'careers' => array( 
+      'Careers' => array( 
         'type'  => 'Event',
         'title' => 'Careers', 
         'event_fields' => array(
@@ -57,7 +57,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'status',
         ),
       ),
-      'mentor' => array( 
+      'Mentor' => array( 
         'type'  => 'Event',
         'title' => 'Mentor (Alumni)', 
         'event_fields' => array(
@@ -73,7 +73,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'student_contact' => array('Attendee'), // roles for student-contact
         ),
       ),
-      'work_exp' => array( 
+      'Work Experience' => array( 
         'type'  => 'Event',
         'title' => 'Work Experience', 
         'event_fields' => array(
@@ -89,7 +89,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'student_contact' => array('Attendee'), // roles for student-contact
         ),
       ),
-      'donation' => array( 
+      'Donation' => array( 
         'type'  => 'Activity',
         'title' => 'Donations / Fundraising', 
         'activity_fields' => array(
@@ -99,7 +99,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'custom' => array('Amount', 'Purpose'),
         ),
       ),
-      'governor' => array( 
+      'Governor' => array( 
         'type'  => 'Activity',
         'title' => 'Governor', 
         'activity_fields' => array(
@@ -110,7 +110,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'custom' => array(), // end date is still custom, so we keep custom keyword
         ),
       ),
-      'non_careers' => array( 
+      'Non Careers' => array( 
         'type'  => 'Event',
         'title' => 'Non-Careers', 
         'event_fields' => array(
@@ -125,7 +125,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'status',
         ),
       ),
-      'other' => array( 
+      'Other' => array( 
         'type'  => 'Activity',
         'title' => 'Other', 
         'activity_fields' => array(
@@ -143,6 +143,9 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
    * @access public
    */
   public function preProcess() {
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    //FIXME: make sure act id has a type which is among the mtypes
+
     $session = CRM_Core_Session::singleton();
     //FIXME: report instance id is hardcoded
     $session->pushUserContext(CRM_Utils_System::url('civicrm/report/instance/41', 'force=1'));
@@ -155,6 +158,8 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
       CRM_Core_Error::fatal(ts("Can't find the school contact."));
     }
     $this->assign('schoolId', $this->_schoolId);
+
+    $this->_mtype = $this->get('mtype');
   }
 
   function getMobilisationTypes($types = array()) {

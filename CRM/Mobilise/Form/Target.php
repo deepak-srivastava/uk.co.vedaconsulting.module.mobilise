@@ -46,18 +46,17 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
    * @access public
    */
   public function preProcess() {
-    $this->_mtype = $this->get('mtype');
+    parent::preProcess();
+
     $this->assign('activity_fields', $this->_metadata[$this->_mtype]['activity_fields']);
 
-    $this->_activityTypeId = $this->get('activity_id');
+    $this->_activityTypeId = $this->get('activity_type_id');
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, TRUE);
     if ($actType = CRM_Utils_Array::value($this->_activityTypeId, $activityTypes)) {
       $this->assign('activityType', $actType);
     } else {
       CRM_Core_Error::fatal("Can't determine activity type.");
     }
-
-    parent::preProcess();
   }
 
   /**

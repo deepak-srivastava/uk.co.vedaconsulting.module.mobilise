@@ -46,8 +46,10 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
    * @access public
    */
   public function preProcess() {
-    $this->_mtype = $this->get('mtype');
-    $this->assign('participant_fields', $this->_metadata[$this->_mtype]['participant_fields']);
+    parent::preProcess();
+
+    $this->assign('participant_fields', 
+      $this->_metadata[$this->_mtype]['participant_fields']);
 
     if (!$this->get('event_id')) {
       CRM_Core_Error::fatal(ts("Couldn't determine the Event."));
@@ -72,7 +74,7 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
        array_key_exists('student_contact', $this->_metadata[$this->_mtype]['participant_fields'])) {
       CRM_Core_Error::fatal(ts('Student Contact roles missing.'));
     }
-    parent::preProcess();
+    $this->_activityTypeId = $this->get('activity_type_id');
   }
 
   /**
@@ -147,9 +149,9 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
             'version'       => 3,
           );
         $result = civicrm_api( 'participant','create', $params );
-	if (!$result['is_error'] && $result['count'] > 0) {
-            $count++;
-	}
+        if (!$result['is_error'] && $result['count'] > 0) {
+          $count++;
+        }
       }
     }
     if (!empty($values['contact_select_id'])) {
@@ -174,6 +176,18 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
         }
       }
     }
+
+    if (!$this->_id) {
+      $params = array(
+        'status_id' => CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name'),
+        'source_contact_id' => $this->_schoolId,
+        'source_record_id'  => $this->get('event_id'),
+        'assignee_contact_id' => $this->_currentUserId,
+        'activity_type_id'    => $this->_activityTypeId,
+        'activity_date_time'  => $now );
+      $activity = CRM_Activity_BAO_Activity::create($params);
+    }
+
     if ($count > 0) {
       $statusMsg = ts('Mobilisation successfully created for the selected alumni.');
     } else {
