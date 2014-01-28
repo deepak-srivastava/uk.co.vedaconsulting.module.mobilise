@@ -69,8 +69,19 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
    */
   public function setDefaultValues() {
     $defaults = array();
-    list($defaults['activity_date_time'], $defaults['activity_date_time_time']) = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
 
+    list($defaults['activity_date_time'], $defaults['activity_date_time_time']) = 
+      CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
+    if ($this->_id) {
+      // lets not use Activity::retrieve method as that would also retrieve assignee/target details, we not interested in
+      $activity = new CRM_Activity_DAO_Activity();
+      $activity->id = $this->_id;
+      if ($activity->find(TRUE)) {
+        CRM_Core_DAO::storeValues($activity, $defaults);
+        list($defaults['activity_date_time'], $defaults['activity_date_time_time']) = 
+          CRM_Utils_Date::setDateDefaults($defaults['activity_date_time'], 'activityDateTime');
+      }
+    }
     return $defaults;
   }
 
@@ -96,9 +107,8 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
     // custom handling
     if (array_key_exists('custom', $this->_metadata[$this->_mtype]['activity_fields'])) {
       $this->set('type', 'Activity');
-      //FIXME: uncomment subType when activity-type needs to be considered
       $this->set('subType',  $this->_activityTypeId);
-      $this->set('entityId', NULL);
+      $this->set('entityId', $this->_id);
       $this->set('cgcount',  1);
       CRM_Custom_Form_CustomData::preProcess($this);
       foreach ($this->_groupTree as $gID => &$grpVals) {
@@ -157,12 +167,20 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
   public function postProcess() {
     $params  = $this->controller->exportValues($this->_name);
 
+    $params['id']                  = $this->_id;
     $params['status_id']           = CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name');
-    $params['source_contact_id']   = $this->_schoolId;
-    $params['assignee_contact_id'] = array($this->_currentUserId);
-    $params['activity_type_id']    = $this->_activityTypeId;
     $params['activity_date_time']  = CRM_Utils_Date::processDate(
       $params['activity_date_time'], $params['activity_date_time_time']);
+
+    if (!$this->_id) {
+	$params['source_contact_id']   = $this->_schoolId;
+	$params['assignee_contact_id'] = array($this->_currentUserId);
+	$params['activity_type_id']    = $this->_activityTypeId;
+    } else {
+	// make sure we not deleting assignees or targets for update action
+	$params['deleteActivityAssignment'] = FALSE;
+	$params['deleteActivityTarget']     = FALSE;
+    }
 
     // custom params handling
     if (array_key_exists('custom', $this->_metadata[$this->_mtype]['activity_fields'])) {
@@ -172,24 +190,29 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
         CRM_Core_BAO_CustomField::getFields('Activity', FALSE, FALSE,NULL, NULL, TRUE));
       
       // format custom params
-      $entityID = NULL; // since its a create mode
       $params['custom'] = 
         CRM_Core_BAO_CustomField::postProcess($params,
           $customFields,
-          $entityID,
+          $this->_id,
           'Activity');
     }
 
-    $count = 0;
-    foreach ($this->get('cids') as $cid) {
-      if (CRM_Utils_Type::validate($cid, 'Integer')) {
-        $params['target_contact_id']  = array($cid);
-        $activity = CRM_Activity_BAO_Activity::create($params);
-        if ($activity->id) {
-          $count++;
-        }
-      }
+    if (!$this->_id) {
+	$targetContactIDs = array();
+	foreach ($this->get('cids') as $cid) {
+	    if (CRM_Utils_Type::validate($cid, 'Integer')) {
+		$targetContactIDs[] = $cid;
+	    }
+	}
+	$params['target_contact_id'] = $targetContactIDs;
     }
+
+    $count    = 0;
+    $activity = CRM_Activity_BAO_Activity::create($params);
+    if ($activity->id) {
+	$count++;
+    }
+
     if ($count > 0) {
       $statusMsg = ts('Mobilisation successfully created for the selected alumni.');
     } else {

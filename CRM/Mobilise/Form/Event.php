@@ -50,6 +50,10 @@ class CRM_Mobilise_Form_Event extends CRM_Mobilise_Form_Mobilise {
 
     $eventTypes = array_flip(CRM_Core_OptionGroup::values('event_type'));
     $this->_eventTypeId = CRM_Utils_Array::value($this->_metadata[$this->_mtype]['event_fields']['type'], $eventTypes);
+    
+    if (!$this->_eventTypeId) {
+      CRM_Core_Error::fatal("Event Type '{$this->_metadata[$this->_mtype]['event_fields']['type']}' is not configured or present.");
+    }
   }
 
   /**

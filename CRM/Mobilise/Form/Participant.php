@@ -65,9 +65,11 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
     }
     $studentRoles = $this->_metadata[$this->_mtype]['participant_fields']['student_contact'];
     $this->_studentRoleIDs = array();
-    foreach ($studentRoles as $role) {
-      if ($roleID = CRM_Utils_Array::value($role, $rolesList)) {
-        $this->_studentRoleIDs[] = $roleID;
+    if (!empty($studentRoles)) {
+      foreach ($studentRoles as $role) {
+        if ($roleID = CRM_Utils_Array::value($role, $rolesList)) {
+          $this->_studentRoleIDs[] = $roleID;
+        }
       }
     }
     if (empty($this->_studentRoleIDs) &&
@@ -75,6 +77,27 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
       CRM_Core_Error::fatal(ts('Student Contact roles missing.'));
     }
     $this->_activityTypeId = $this->get('activity_type_id');
+
+    if ($this->_id) {
+      $this->_participants = array();
+      require_once 'api/api.php';
+      $params = 
+        array( 
+          'version'  => 3,
+          'event_id' => $this->get('event_id'),
+        );
+      $result = civicrm_api('participant','get', $params);
+      if (!$result['is_error'] && $result['count'] > 0) {
+        $this->_participants = $result['values'];
+      }
+      if (empty($this->_participants)) {
+        CRM_Core_Error::fatal(ts("Couldn't find any associated alumni with this mobilisation."));
+      }
+      $this->_targetContactIDs = CRM_Activity_BAO_ActivityTarget::retrieveTargetIdsByActivityId($this->_id);
+      if (empty($this->_targetContactIDs)) {
+        CRM_Core_Error::fatal(ts("Couldn't find any alumni already associated with this mobilisation. OR this mobilisation no longer has any alumni associated."));
+      }
+    }
   }
 
   /**
@@ -136,37 +159,19 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
     $count  = 0;
     $now    = date('YmdHis');
 
-    foreach ($this->get('cids') as $cid) {
-      if (CRM_Utils_Type::validate($cid, 'Integer')) {
-        $params = 
-          array( 
-            'contact_id'  => $cid,
-            'event_id'    => $this->get('event_id'),
-            'status_id'   => $values['status_id'],
-            'role_id'     => implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys($values['role_id'])),
-            'register_date' => $now,
-            'source'        => $values['source'],
-            'version'       => 3,
-          );
-        $result = civicrm_api( 'participant','create', $params );
-        if (!$result['is_error'] && $result['count'] > 0) {
-          $count++;
-        }
-      }
-    }
-    if (!empty($values['contact_select_id'])) {
-      foreach ($values['contact_select_id'] as $key => $cid) {
-        $roleIDs = ($key == 1) ? $this->_studentRoleIDs : array();
-        $roleIDs = implode(CRM_Core_DAO::VALUE_SEPARATOR, $roleIDs);
-        if (!empty($roleIDs) && CRM_Utils_Type::validate($cid, 'Integer')) {
+    if (!$this->_id) {
+      // add action
+      $targetContactIDs = array();
+      foreach ($this->get('cids') as $cid) {
+        if (CRM_Utils_Type::validate($cid, 'Integer')) {
+          $targetContactIDs[] = $cid;
           $params = 
             array( 
               'contact_id'  => $cid,
               'event_id'    => $this->get('event_id'),
               'status_id'   => $values['status_id'],
-              'role_id'     => $roleIDs,
+              'role_id'     => implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys($values['role_id'])),
               'register_date' => $now,
-              'source'        => $values['source'],
               'version'       => 3,
             );
           $result = civicrm_api( 'participant','create', $params );
@@ -175,23 +180,88 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
           }
         }
       }
-    }
 
-    if (!$this->_id) {
+      if (!empty($values['contact_select_id'])) {
+        foreach ($values['contact_select_id'] as $key => $cid) {
+          $roleIDs = ($key == 1) ? $this->_studentRoleIDs : array();
+          $roleIDs = implode(CRM_Core_DAO::VALUE_SEPARATOR, $roleIDs);
+          if (!empty($roleIDs) && CRM_Utils_Type::validate($cid, 'Integer')) {
+            $targetContactIDs[] = $cid;
+            $params = 
+              array( 
+                'contact_id'  => $cid,
+                'event_id'    => $this->get('event_id'),
+                'status_id'   => $values['status_id'],
+                'role_id'     => $roleIDs,
+                'register_date' => $now,
+                'version'       => 3,
+              );
+            $result = civicrm_api( 'participant','create', $params );
+            if (!$result['is_error'] && $result['count'] > 0) {
+              $count++;
+            }
+          }
+        }
+      }
+
+      // record mobilisation activity
       $params = array(
         'status_id' => CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name'),
         'source_contact_id' => $this->_schoolId,
         'source_record_id'  => $this->get('event_id'),
         'assignee_contact_id' => $this->_currentUserId,
+        'target_contact_id'   => $targetContactIDs,
         'activity_type_id'    => $this->_activityTypeId,
-        'activity_date_time'  => $now );
+        'activity_date_time'  => $now,
+        'is_current_revision' => 0 ); // setting rev to 0, makes activity hidden on display 
       $activity = CRM_Activity_BAO_Activity::create($params);
+    } else {
+      // update action 
+      $isStudentContactUpdated = FALSE;
+      foreach ($this->_participants as $pid => $pdetails) {
+        if (in_array($pdetails['contact_id'], $this->_targetContactIDs)) {
+          if (!in_array($pdetails['participant_role_id'], $this->_studentRoleIDs)) {
+            $params = 
+              array( 
+                'id'          => $pdetails['participant_id'],
+                'status_id'   => $values['status_id'],
+                'role_id'     => implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys($values['role_id'])),
+              );
+            $result = CRM_Event_BAO_Participant::create($params);
+            if ($result->id) {
+              $count++;
+            }
+            CRM_Core_Error::debug_log_message("Alumni updated: pid={$result->id}, cid={$result->contact_id}, sort-name={$pdetails['sort_name']}");
+          } else if (!$isStudentContactUpdated && 
+            !empty($values['contact_select_id'][1]) && 
+            $pdetails['contact_id'] != $values['contact_select_id'][1]) {
+            // for new student role contact we drop & create a new participant
+            $params = 
+              array( 
+                'contact_id'  => $values['contact_select_id'][1],
+                'event_id'    => $this->get('event_id'),
+                'status_id'   => $values['status_id'],
+                'role_id'     => implode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_studentRoleIDs),
+                'register_date' => $now,
+                'version'       => 3,
+              );
+            $result = CRM_Event_BAO_Participant::create($params);
+            if ($result->id) {
+              CRM_Event_BAO_Participant::deleteParticipant($pdetails['participant_id']);
+              $isStudentContactUpdated = TRUE; // only handle once
+              CRM_Core_Error::debug_log_message("Alumni student role updated: pid={$result->id}, cid={$result->contact_id}");
+            }
+          }
+        }
+      }
     }
 
     if ($count > 0) {
-      $statusMsg = ts('Mobilisation successfully created for the selected alumni.');
+      $statusMsg = $this->_id ? ts('Mobilisation successfully updated.') : 
+        ts('Mobilisation successfully created for the selected alumni.');
     } else {
-      $statusMsg = ts('Could not create any mobilisations.');
+      $statusMsg = $this->_id ? ts('Could not update any mobilisations.') : 
+        ts('Could not create any mobilisations.');
     }
     $this->set('status', $statusMsg);
   }
@@ -207,4 +277,3 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
     return ts('Assign Alumni');
   }
 }
-
