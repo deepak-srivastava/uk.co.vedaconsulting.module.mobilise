@@ -6,4 +6,10 @@
     <page_callback>CRM_Mobilise_Controller_Mobilise</page_callback>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/mobilise/del</path>
+    <title>Delete Mobilisation</title>
+    <page_callback>CRM_Mobilise_Form_Delete</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>
