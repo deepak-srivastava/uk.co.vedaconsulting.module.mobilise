@@ -133,10 +133,6 @@
       contactUrl = contactUrl + '&cid=' + {/literal}{$contactId}{literal};
       {/literal}{/if}{literal}
 
-      {/literal}{if $schoolId}{literal}
-      contactUrl = contactUrl + '&id=' + {/literal}{$schoolId}{literal};
-      {/literal}{/if}{literal}
-
       var contactElement = '#' + prefix + 'contact_' + blockNo;
       var contactHiddenElement = 'input[name="{/literal}{$prefix}{literal}contact_select_id[' + blockNo +']"]';
       cj( contactElement ).autocomplete( contactUrl, {
