@@ -53,6 +53,11 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
 
     if (!$this->get('event_id')) {
       CRM_Core_Error::fatal(ts("Couldn't determine the Event."));
+    } else {
+      $eventList = CRM_Event_PseudoConstant::event();
+      if ($event = CRM_Utils_Array::value($this->get('event_id'), $eventList)) {
+        $this->assign('event', $event);
+      }
     }
 
     $rolesList = array_flip(CRM_Event_PseudoConstant::participantRole());

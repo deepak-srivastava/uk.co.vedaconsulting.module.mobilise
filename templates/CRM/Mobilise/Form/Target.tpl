@@ -76,3 +76,14 @@
 
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
 </div>
+
+{literal}
+<script type="text/javascript">
+  cj(document).ready(function(){
+    var customID   = "{/literal}{$amountCustomIdPrefix}{literal}";
+    var amountSpan = cj('input[type=text][name^="' + customID + '"]');
+    var message    = "{/literal}Please enter just the amount, without a leading {$config->defaultCurrencySymbol}.{literal}";
+    cj('<br/><span class="description">' + message + '</span>').insertAfter(amountSpan);
+  });
+</script>
+{/literal}

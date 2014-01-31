@@ -101,7 +101,7 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
       }
     }
     if (in_array('notes', $this->_metadata[$this->_mtype]['activity_fields'])) {
-      $this->add('textarea', 'details', ts('Notes'), 'rows=3, cols=60', TRUE);
+      $this->add('textarea', 'details', ts('Notes'), 'rows=3, cols=60', FALSE);
     }
 
     // custom handling
@@ -115,6 +115,8 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
         foreach ($grpVals['fields'] as $fID => &$fldVals) {
           if (!in_array($fldVals['label'], $this->_metadata[$this->_mtype]['activity_fields']['custom'])) {
             unset($grpVals['fields'][$fID]);
+          } else if (strtolower($fldVals['label']) == "amount") {
+            $this->assign("amountCustomIdPrefix", "custom_{$fID}_");
           }
           if (array_key_exists('activity_end_date', $this->_metadata[$this->_mtype]['activity_fields'])) {
             if ($fldVals['label'] == $this->_metadata[$this->_mtype]['activity_fields']['activity_end_date']) {
@@ -158,7 +160,7 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
     $fromDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('activity_date_time', $fields));
     $endDate  = CRM_Utils_Date::processDate(CRM_Utils_Array::value($self->_dateCustomFieldName, $fields));
     if ($endDate < $fromDate) {
-      $errors[$self->_dateCustomFieldName] = ts("Till date can't be earlier than the From Date.");
+      $errors[$self->_dateCustomFieldName] = ts("To date can't be earlier than the From Date.");
     }
 
     return $errors;
@@ -173,13 +175,13 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
       $params['activity_date_time'], $params['activity_date_time_time']);
 
     if (!$this->_id) {
-	$params['source_contact_id']   = $this->_schoolId;
-	$params['assignee_contact_id'] = array($this->_currentUserId);
-	$params['activity_type_id']    = $this->_activityTypeId;
+      $params['source_contact_id']   = $this->_schoolId;
+      $params['assignee_contact_id'] = array($this->_currentUserId);
+      $params['activity_type_id']    = $this->_activityTypeId;
     } else {
-	// make sure we not deleting assignees or targets for update action
-	$params['deleteActivityAssignment'] = FALSE;
-	$params['deleteActivityTarget']     = FALSE;
+      // make sure we not deleting assignees or targets for update action
+      $params['deleteActivityAssignment'] = FALSE;
+      $params['deleteActivityTarget']     = FALSE;
     }
 
     // custom params handling
@@ -198,19 +200,19 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
     }
 
     if (!$this->_id) {
-	$targetContactIDs = array();
-	foreach ($this->get('cids') as $cid) {
-	    if (CRM_Utils_Type::validate($cid, 'Integer')) {
-		$targetContactIDs[] = $cid;
-	    }
-	}
-	$params['target_contact_id'] = $targetContactIDs;
+      $targetContactIDs = array();
+      foreach ($this->get('cids') as $cid) {
+        if (CRM_Utils_Type::validate($cid, 'Integer')) {
+          $targetContactIDs[] = $cid;
+        }
+      }
+      $params['target_contact_id'] = $targetContactIDs;
     }
 
     $count    = 0;
     $activity = CRM_Activity_BAO_Activity::create($params);
     if ($activity->id) {
-	$count++;
+      $count++;
     }
 
     if ($count > 0) {

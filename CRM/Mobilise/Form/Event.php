@@ -125,6 +125,31 @@ class CRM_Mobilise_Form_Event extends CRM_Mobilise_Form_Mobilise {
         'name' => ts('Cancel'),
       );
     $this->addButtons($buttons);
+
+    $this->addFormRule(array('CRM_Mobilise_Form_Event', 'formRule'), $this);
+  }
+
+  /**
+   * global form rule
+   *
+   * @param array $fields  the input form values
+   * @param array $files   the uploaded files if any
+   * @param array $options additional user data
+   *
+   * @return true if no errors, else array of errors
+   * @access public
+   * @static
+   */
+  static function formRule($fields, $files, $self) {
+    $errors = array();
+
+    $buttonClicked = $self->controller->getButtonName();
+    if ($buttonClicked == '_qf_Event_next' && 
+      !$fields['event_id']) {
+      $errors['event_id'] = ts("Please select an event OR click 'New Event' button to create one.");
+    }
+
+    return $errors;
   }
 
   public function postProcess() {

@@ -36,6 +36,9 @@
     <div class="crm-accordion-body">
 
       <table class="form-layout-compressed">
+	{if $event}
+	<tr class="crm-mobilise-group-alumni-block-event"><td class="label">{ts}Event{/ts}</td><td>{$event}</td></tr>
+	{/if}
 	{if array_key_exists('role', $participant_fields)}
 	<tr class="crm-mobilise-group-alumni-block-role_id"><td class="label">{$form.role_id.label}</td><td>{$form.role_id.html}</td></tr>
 	{/if}
