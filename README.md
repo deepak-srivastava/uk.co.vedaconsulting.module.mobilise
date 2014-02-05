@@ -1,4 +1,6 @@
-Some queries: 
+**Some Queries:**
+
+**Note:** Most of the config rules are defined by an array variable "$_metadata" in the file CRM/Mobilise/Form/Mobilise.php 
 
 Q1 - it seems that, in some instances, the role is being prepopulated on type? It'd be useful if we knew how to do this for different roles. Is this done by jQuery or by code, or just by civievent?
 
