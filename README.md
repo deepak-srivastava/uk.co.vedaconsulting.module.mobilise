@@ -3,10 +3,10 @@ Some queries:
 Q1 - it seems that, in some instances, the role is being prepopulated on type? It'd be useful if we knew how to do this for different roles. Is this done by jQuery or by code, or just by civievent?
 
 A1. Following field values are responsible for this:
-$_metadata['Careers']['participant_fields']['role'] 
-$_metadata['Mentor']['participant_fields']['role'] 
-$_metadata['Work Experience']['participant_fields']['role']
-$_metadata['Non Careers']['participant_fields']['role'] 
+- $_metadata['Careers']['participant_fields']['role'] 
+- $_metadata['Mentor']['participant_fields']['role'] 
+- $_metadata['Work Experience']['participant_fields']['role']
+- $_metadata['Non Careers']['participant_fields']['role'] 
 
 Q2 - In the same vein as Q1, there are role options (i.e. volunteer) which probably aren't needed at all, and others that aren't needed for the teacher interface, but are likely to be needed for the back end system (i.e. alumni outreach officer, facilitator). Is there a jQuery or PHP function that modifies these anyway? If so, where?
 
@@ -25,10 +25,10 @@ On Administer >>  CiviEvent >> Participant Roles
 Rename participant role from "Mentor (Alumni)" to "Mentor".
 
 In file CRM/Mobilise/Form/Mobilise.php, adjust following accordingly: 
-$_metadata['Careers']['participant_fields']['role'] 
-$_metadata['Mentor']['participant_fields']['role'] 
-$_metadata['Work Experience']['participant_fields']['role']
-$_metadata['Non Careers']['participant_fields']['role'] 
+- $_metadata['Careers']['participant_fields']['role'] 
+- $_metadata['Mentor']['participant_fields']['role'] 
+- $_metadata['Work Experience']['participant_fields']['role']
+- $_metadata['Non Careers']['participant_fields']['role'] 
 
 Q4 - We'd like to customise the participant status options. Expired isn't relevant to us, and we'd like "attended" to be renamed "completed" and appear at the top of the list. How can we do this?
 
@@ -45,7 +45,7 @@ Q6 - Further to Q5, how can we change the labels on these options?
 
 A6. $_metadata has "title" field which will need to be adjusted.
 Example:
-$_metadata['Careers']['title']
-$_metadata['Mentor']['title']
-$_metadata['Donation']['title']
-.... 
+- $_metadata['Careers']['title']
+- $_metadata['Mentor']['title']
+- $_metadata['Donation']['title']
+- .... 
