@@ -46,8 +46,21 @@ class CRM_Mobilise_Form_Delete extends CRM_Core_Form {
    * @access public
    */
   public function preProcess() {
-    parent::preProcess();
-    //FIXME: do checks to ensure user has right privileges to delete mobilisation
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+    $activityTypeID = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $this->_id, 'activity_type_id');
+
+    $activityTypes = CRM_Core_PseudoConstant::activityType();
+    $mType = $activityTypes[$activityTypeID];
+    if ($mType = CRM_Utils_Array::value($activityTypeID, $activityTypes)) {
+      $mob = new CRM_Mobilise_Form_Mobilise();
+      $metadata = $mob->getVar('_metadata');
+      if (!array_key_exists($mType, $metadata)) {
+        CRM_Core_Error::statusBounce(ts("Doesn't look like a mobilisation."));
+      }
+    } else {
+      CRM_Core_Error::statusBounce(ts("Doesn't look like a mobilisation. Note this also deletes all records that were created with this mobisation."));
+    }
+    $this->assign('mType', $mType);
   }
 
   /**
@@ -72,6 +85,15 @@ class CRM_Mobilise_Form_Delete extends CRM_Core_Form {
   }
 
   public function postProcess() {
+    $sourceRecID = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $this->_id, 'source_record_id');
+    if ($sourceRecID) {
+      CRM_Event_BAO_Event::del($sourceRecID);
+    }
+    $activityParams = array('id' => $this->_id);
+    $result = CRM_Activity_BAO_Activity::deleteActivity($activityParams);
+    if ($result) {
+      CRM_Core_Session::setStatus("Mobilisation Deleted.");
+    }
   }
 }
 

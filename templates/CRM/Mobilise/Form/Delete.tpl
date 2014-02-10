@@ -27,7 +27,7 @@
   <table class="form-layout">
     <tr>
       <td colspan="2">
-      <div class="status">{ts 1=$delName}Are you sure you want to delete '%1'?{/ts}</div>
+      <div class="status">{ts 1=$mType}Are you sure you want to delete this '%1' Mobilisation?{/ts}</div>
       </td>
     </tr>
   </table>  

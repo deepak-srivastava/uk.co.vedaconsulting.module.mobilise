@@ -136,6 +136,10 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
       ),
     );
 
+  function getVar($name) {
+    return isset($this->$name) ? $this->$name : NULL;
+  }
+
   /**
    * Function to set variables up before form is built
    *
