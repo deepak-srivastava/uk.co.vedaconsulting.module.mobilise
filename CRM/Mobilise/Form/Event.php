@@ -83,17 +83,17 @@ class CRM_Mobilise_Form_Event extends CRM_Mobilise_Form_Mobilise {
   public function buildQuickForm() {
     $schoolTable  = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', CRM_Mobilise_Form_Mobilise::SCHOOL_CUSTOM_SET_TITLE, 'table_name', 'title');
     $schoolColumn = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', CRM_Mobilise_Form_Mobilise::SCHOOL_HOST_CUSTOM_FIELD_TITLE, 'column_name', 'label');
-    $condition    = "( is_template IS NULL OR is_template != 1 )";
+    $condition    = "( e.is_template IS NULL OR e.is_template != 1 )";
     if ($this->_eventTypeId) {
-      $condition .= " AND event_type_id = {$this->_eventTypeId}";
+      $condition .= " AND e.event_type_id = {$this->_eventTypeId}";
     }
 
     $events = array();
     $query  = "
       SELECT e.id, e.title
-      FROM civicrm_event e
-      INNER JOIN $schoolTable s ON s.entity_id = e.id
-      WHERE s.{$schoolColumn} = %1 AND {$condition}";
+        FROM civicrm_event e
+  INNER JOIN $schoolTable s ON s.entity_id = e.id
+       WHERE s.{$schoolColumn} = %1 AND e.is_active=1 AND {$condition}";
     $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($this->_schoolId, 'Integer')));
     while ($dao->fetch()) {
       $events[$dao->id] = $dao->title;
@@ -144,9 +144,20 @@ class CRM_Mobilise_Form_Event extends CRM_Mobilise_Form_Mobilise {
     $errors = array();
 
     $buttonClicked = $self->controller->getButtonName();
-    if ($buttonClicked == '_qf_Event_next' && 
-      !$fields['event_id']) {
-      $errors['event_id'] = ts("Please select an event OR click 'New Event' button to create one.");
+    if ($buttonClicked == '_qf_Event_next') {
+      if(!$fields['event_id']) {
+        $errors['event_id'] = ts("Please select an event OR click 'New Event' button to create one.");
+      } else if (!$self->_id) { // for action = add
+        $query = "SELECT contact_id FROM civicrm_participant WHERE event_id = %1 AND contact_id IN (". implode(",", $self->get('cids')) .")";
+        $dao   = CRM_Core_DAO::executeQuery($query, array(1 => array($fields['event_id'], 'Integer')));
+        if ($dao->fetch()) {
+          if ($dao->N == count($self->get('cids'))) {
+            $errors['event_id'] = ts("All of selected alumni, are already registered for this event.");
+          } else if ($dao->N < count($self->get('cids'))) {
+            $errors['event_id'] = ts("A few of selected alumni, are already registered for this event.");
+          }
+        }
+      }
     }
 
     return $errors;
