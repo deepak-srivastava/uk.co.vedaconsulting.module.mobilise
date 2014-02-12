@@ -74,6 +74,9 @@ class CRM_Mobilise_Page_List extends CRM_Core_Page {
   }
 
   function run() {
+    $session = CRM_Core_Session::singleton();
+    $session->pushUserContext(CRM_Utils_System::url('civicrm/mobilise/list', 'reset=1'));
+
     $this->browse();
     return parent::run();
   }

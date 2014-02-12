@@ -37,7 +37,6 @@
       <th >{ts}Staff Contact{/ts}</th>
       <th >{ts}Session Focus{/ts}</th>
       <th >{ts}Alumni{/ts}</th>
-      <th >{ts}Student{/ts}</th>
       <th >{ts}Note{/ts}</th>
       <th ></th>
     </tr>
@@ -45,12 +44,11 @@
   {foreach from=$rows item=row}
     {if $row.mobilisation eq 'Careers'}
       <tr id="row_{$row.id}" class="{cycle values="odd-row,even-row"}">
-	<td >{$row.date|crmDate}</td>
+	<td >{$row.date|truncate:10:''|crmDate}</td>
 	<td >{$row.title}</td>
 	<td >{$row.staff}</td>
 	<td >{$row.session}</td>
 	<td >{$row.alumni}</td>
-	<td >{$row.student}</td>
 	<td >{$row.notes}</td>
 	<td>{$row.action}</td>
       </tr>
@@ -63,6 +61,7 @@
   <thead>
     <tr id="options" class="columnheader">
       <th >{ts}Date Range{/ts}</th>
+      <th >{ts}Event{/ts}</th>
       <th >{ts}Student{/ts}</th>
       <th >{ts}Alumni{/ts}</th>
       <th >{ts}Staff{/ts}</th>
@@ -73,7 +72,8 @@
   {foreach from=$rows item=row}
     {if $row.mobilisation eq 'Mentor'}
       <tr id="row_{$row.id}" class="{cycle values="odd-row,even-row"}">
-	<td >{$row.date|crmDate}</td>
+	<td >{$row.date|truncate:10:''|crmDate}{if $row.end_date} - {$row.end_date|truncate:10:''|crmDate}{/if}</td>
+	<td >{$row.title}</td>
 	<td >{$row.student}</td>
 	<td >{$row.alumni}</td>
 	<td >{$row.staff}</td>
@@ -89,6 +89,7 @@
   <thead>
     <tr id="options" class="columnheader">
       <th >{ts}Date Range{/ts}</th>
+      <th >{ts}Event{/ts}</th>
       <th >{ts}Student{/ts}</th>
       <th >{ts}Alumni{/ts}</th>
       <th >{ts}Staff{/ts}</th>
@@ -99,7 +100,8 @@
   {foreach from=$rows item=row}
     {if $row.mobilisation eq 'Work Experience'}
       <tr id="row_{$row.id}" class="{cycle values="odd-row,even-row"}">
-	<td >{$row.date|crmDate}</td>
+	<td >{$row.date|truncate:10:''|crmDate}</td>
+	<td >{$row.title}</td>
 	<td >{$row.student}</td>
 	<td >{$row.alumni}</td>
 	<td >{$row.staff}</td>
@@ -126,7 +128,7 @@
     {if $row.mobilisation eq 'Donation'}
       <tr id="row_{$row.id}" class="{cycle values="odd-row,even-row"}">
 	<td >{$row.date|crmDate}</td>
-	<td >{$row.amount}</td>
+	<td >{$row.amount|crmMoney}</td>
 	<td >{$row.purpose}</td>
 	<td >{$row.alumni}</td>
 	<td >{$row.notes}</td>
@@ -166,11 +168,11 @@
 <table class="display">
   <thead>
     <tr id="options" class="columnheader">
-      <th >{ts}Date Given{/ts}</th>
-      <th >{ts}Amount{/ts}</th>
-      <th >{ts}Purpose{/ts}</th>
-      <th >{ts}Staff{/ts}</th>
+      <th >{ts}Date Range{/ts}</th>
+      <th >{ts}Event{/ts}</th>
+      <th >{ts}Student{/ts}</th>
       <th >{ts}Alumni{/ts}</th>
+      <th >{ts}Staff{/ts}</th>
       <th >{ts}Note{/ts}</th>
       <th ></th>
     </tr>
@@ -178,11 +180,11 @@
   {foreach from=$rows item=row}
     {if $row.mobilisation eq 'Non Careers'}
       <tr id="row_{$row.id}" class="{cycle values="odd-row,even-row"}">
-	<td >{$row.date|crmDate}</td>
-	<td >0.00</td>
-	<td >purpose</td>
-	<td >staff..</td>
+	<td >{$row.date|truncate:10:''|crmDate}</td>
+	<td >{$row.title}</td>
+	<td >{$row.student}</td>
 	<td >{$row.alumni}</td>
+	<td >{$row.staff}</td>
 	<td >{$row.notes}</td>
 	<td>{$row.action}</td>
       </tr>
@@ -206,7 +208,7 @@
     {if $row.mobilisation eq 'Other'}
       <tr id="row_{$row.id}" class="{cycle values="odd-row,even-row"}">
 	<td >{$row.date|crmDate}</td>
-	<td >{$row.amount}</td>
+	<td >{$row.amount|crmMoney}</td>
 	<td >{$row.purpose}</td>
 	<td >{$row.alumni}</td>
 	<td >{$row.notes}</td>

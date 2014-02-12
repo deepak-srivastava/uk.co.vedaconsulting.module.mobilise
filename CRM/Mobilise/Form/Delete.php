@@ -48,9 +48,8 @@ class CRM_Mobilise_Form_Delete extends CRM_Core_Form {
   public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $activityTypeID = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $this->_id, 'activity_type_id');
+    $activityTypes  = CRM_Core_PseudoConstant::activityType();
 
-    $activityTypes = CRM_Core_PseudoConstant::activityType();
-    $mType = $activityTypes[$activityTypeID];
     if ($mType = CRM_Utils_Array::value($activityTypeID, $activityTypes)) {
       $mob = new CRM_Mobilise_Form_Mobilise();
       $metadata = $mob->getVar('_metadata');
@@ -58,7 +57,7 @@ class CRM_Mobilise_Form_Delete extends CRM_Core_Form {
         CRM_Core_Error::statusBounce(ts("Doesn't look like a mobilisation."));
       }
     } else {
-      CRM_Core_Error::statusBounce(ts("Doesn't look like a mobilisation. Note this also deletes all records that were created with this mobisation."));
+      CRM_Core_Error::statusBounce(ts("Doesn't look like a mobilisation."));
     }
     $this->assign('mType', $mType);
   }
@@ -87,10 +86,22 @@ class CRM_Mobilise_Form_Delete extends CRM_Core_Form {
   public function postProcess() {
     $sourceRecID = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $this->_id, 'source_record_id');
     if ($sourceRecID) {
-      CRM_Event_BAO_Event::del($sourceRecID);
+      // delete any participants that are part of mobilisation
+      $query = "
+            SELECT cp.id
+              FROM civicrm_activity ca
+        INNER JOIN civicrm_activity_target cat              ON cat.activity_id = ca.id
+        INNER JOIN civicrm_event ce                         ON ca.source_record_id = ce.id
+        INNER JOIN civicrm_participant cp                   ON cat.target_contact_id = cp.contact_id AND ce.id = cp.event_id
+             WHERE ca.id = %1";
+      $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($this->_id, 'Integer')));
+      while ($dao->fetch()) {
+        CRM_Event_BAO_Participant::deleteParticipant($dao->id);
+      }
     }
     $activityParams = array('id' => $this->_id);
     $result = CRM_Activity_BAO_Activity::deleteActivity($activityParams);
+
     if ($result) {
       CRM_Core_Session::setStatus("Mobilisation Deleted.");
     }

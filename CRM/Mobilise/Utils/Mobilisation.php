@@ -54,9 +54,10 @@ class CRM_Mobilise_Utils_Mobilisation {
     $activityCustomInfo = $this->getCustomInfo(CRM_Mobilise_Form_Mobilise::ACTIVITY_CUSTOM_SET_TITLE);
 
     $query = "
-      SELECT ca.id as mobID,
+    SELECT ca.id as mobID,
            cov.label as mobilisation,
-           ca.activity_date_time,
+           IF(ce.id IS NULL, ca.activity_date_time, ce.start_date) as date,
+           IF(ce.id IS NULL, ca.activity_date_time, ce.end_date) as end_date,
            ca.details,
            ce.id as event_id,
            ce.title,
@@ -68,15 +69,17 @@ INNER JOIN civicrm_option_group cog                 ON cog.id = cov.option_group
  LEFT JOIN civicrm_event ce                         ON ca.source_record_id = ce.id AND ce.is_active = 1
  LEFT JOIN {$eventCustomInfo['table_name']} eventc  ON ce.id = eventc.entity_id
  LEFT JOIN {$activityCustomInfo['table_name']} actc ON ca.id = actc.entity_id
-     WHERE cov.label IN ('" . implode("', '", $mobActivityTypes) . "')";
+     WHERE cov.label IN ('" . implode("', '", $mobActivityTypes) . "')
+  ORDER BY ca.activity_date_time DESC";
     $mob = CRM_Core_DAO::executeQuery($query);
     while ($mob->fetch()) {
       $mobilisations[$mob->mobID] = array();
       $mobilisations[$mob->mobID]['id']           = $mob->mobID;
       $mobilisations[$mob->mobID]['mobilisation'] = $mob->mobilisation;
-      $mobilisations[$mob->mobID]['date']         = $mob->activity_date_time;
       $mobilisations[$mob->mobID]['event_id']     = $mob->event_id;
       $mobilisations[$mob->mobID]['title']        = $mob->title;
+      $mobilisations[$mob->mobID]['date']         = $mob->date;
+      $mobilisations[$mob->mobID]['end_date']     = $mob->end_date;
 
       if ($this->_metadata[$mob->mobilisation]['type'] == 'Event') {
         $mobilisations[$mob->mobID]['staff'] = 
@@ -95,7 +98,7 @@ INNER JOIN civicrm_option_group cog                 ON cog.id = cov.option_group
           $mob->{$activityCustomInfo[CRM_Mobilise_Form_Mobilise::ACTIVITY_AMOUNT_CUSTOM_FIELD_TITLE]['column_name']};
         $mobilisations[$mob->mobID]['purpose'] = 
           $mob->{$activityCustomInfo[CRM_Mobilise_Form_Mobilise::ACTIVITY_PURPOSE_CUSTOM_FIELD_TITLE]['column_name']};
-        $mobilisations[$mob->mobID]['alumni'] = 
+        $mobilisations[$mob->mobID]['alumni']  = 
           $this->getActivityAlumni($mob->mobID);
         $mobilisations[$mob->mobID]['notes']  = $mob->details;
       }
@@ -118,14 +121,19 @@ INNER JOIN civicrm_option_group cog                 ON cog.id = cov.option_group
   function getEventAlumni($activityID, $mType, $isStudentRole = FALSE) {
     static $eventAlumni = array();
     if ($isStudentRole) {
-      $alumniRoles = $this->_metadata[$mType]['participant_fields']['student_contact'];
+      if (CRM_Utils_Array::value('student_contact', $this->_metadata[$mType]['participant_fields'])) {
+        $alumniRoles = $this->_metadata[$mType]['participant_fields']['student_contact'];
+      } else { 
+        return NULL;
+      }
     }
-    $cacheKey    = "key_" . (empty($alumniRoles) ? "" : implode("_", $alumniRoles));
+    $cacheKey = "key_" . (empty($alumniRoles) ? "" : implode("_", $alumniRoles));
 
     if (!array_key_exists($cacheKey, $eventAlumni)) {
       $eventAlumni[$cacheKey] = array();
       $mobActivityTypes = array_keys($this->_metadata);
 
+      $roleClause    = "";
       $alumniRoleIDs = array();
       if (!empty($alumniRoles)) {
         $rolesList = array_flip(CRM_Event_PseudoConstant::participantRole());
@@ -134,20 +142,20 @@ INNER JOIN civicrm_option_group cog                 ON cog.id = cov.option_group
             $alumniRoleIDs[] = $roleID;
           }
         }
-      }
-      $roleClause = "";
-      if (!empty($alumniRoleIDs)) {
-        $roleClause = "AND cp.role_id REGEXP '[[:<:]]" . implode('|', $alumniRoleIDs) . "[[:>:]]'";
+        if (!empty($alumniRoleIDs)) {
+          $roleClause = "AND cp.role_id REGEXP '[[:<:]]" . implode('|', $alumniRoleIDs) . "[[:>:]]'";
+        }
       }
 
       $query = "
         SELECT ca.id as mobID,
         GROUP_CONCAT(DISTINCT sort_name ORDER BY sort_name ASC ) as alumni
         FROM civicrm_activity ca
+        INNER JOIN civicrm_activity_target cat              ON cat.activity_id = ca.id
         INNER JOIN civicrm_option_value cov                 ON ca.activity_type_id = cov.value
         INNER JOIN civicrm_option_group cog                 ON cog.id = cov.option_group_id AND cog.name = 'activity_type'
         INNER JOIN civicrm_event ce                         ON ca.source_record_id = ce.id AND ce.is_active = 1
-        INNER JOIN civicrm_participant cp                   ON cp.event_id = ce.id
+        INNER JOIN civicrm_participant cp                   ON cat.target_contact_id = cp.contact_id AND ce.id = cp.event_id
         INNER JOIN civicrm_contact     cc                   ON cc.id = cp.contact_id
         WHERE cov.label IN ('" . implode("', '", $mobActivityTypes) . "') {$roleClause}
         GROUP BY ca.id
