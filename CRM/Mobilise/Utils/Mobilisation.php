@@ -118,7 +118,7 @@ INNER JOIN civicrm_option_group cog                 ON cog.id = cov.option_group
     }
     return NULL;
   }
-
+ 
   function getEventAlumni($activityID, $mType, $isStudentRole = FALSE) {
     static $eventAlumni = array();
     if ($isStudentRole) {
@@ -150,7 +150,8 @@ INNER JOIN civicrm_option_group cog                 ON cog.id = cov.option_group
 
       $query = "
         SELECT ca.id as mobID,
-        GROUP_CONCAT(DISTINCT sort_name ORDER BY sort_name ASC ) as alumni
+        cc.sort_name as alumni,
+        cc.id as cid
         FROM civicrm_activity ca
         INNER JOIN civicrm_activity_target cat              ON cat.activity_id = ca.id
         INNER JOIN civicrm_option_value cov                 ON ca.activity_type_id = cov.value
@@ -159,14 +160,19 @@ INNER JOIN civicrm_option_group cog                 ON cog.id = cov.option_group
         INNER JOIN civicrm_participant cp                   ON cat.target_contact_id = cp.contact_id AND ce.id = cp.event_id
         INNER JOIN civicrm_contact     cc                   ON cc.id = cp.contact_id
         WHERE cov.label IN ('" . implode("', '", $mobActivityTypes) . "') {$roleClause}
-        GROUP BY ca.id
+        GROUP BY ca.id, cc.sort_name, cc.id
+        ORDER BY cc.sort_name ASC
         ";
       $dao = CRM_Core_DAO::executeQuery($query);
+      $aAlumnis = array();
       while ($dao->fetch()) {
-        $eventAlumni[$cacheKey][$dao->mobID] = array();
-        $eventAlumni[$cacheKey][$dao->mobID]['id']     = $dao->mobID;
-        $eventAlumni[$cacheKey][$dao->mobID]['alumni'] = $dao->alumni;
+     
+        $aAlumnis[$dao->mobID][] = sprintf( "<a href='civicrm/contact/view?reset=1&cid=%d'>%s</a>"
+                        , $dao->cid
+                        , $dao->alumni
+                        );
       }
+      $eventAlumni[$cacheKey][$activityID]['alumni'] = implode(', ', $aAlumnis[$activityID]);
     }
     return $eventAlumni[$cacheKey][$activityID]['alumni'];
   }
@@ -189,4 +195,5 @@ INNER JOIN civicrm_option_group cog                 ON cog.id = cov.option_group
     }
     return $customInfo;
   }
+
 }
