@@ -49,16 +49,6 @@
 	  {/if}
 	</tr>
 	{/if}
-	{if array_key_exists('activity_end_date', $activity_fields)}
-	<tr class="crm-mobilise-group-target-block-custom_date_time">
-	  <td class="label">{$form.$customDate.label}</td>
-	  {if $hideCalendar neq true}
-	  <td class="view-value">{include file="CRM/common/jcalendar.tpl" elementName=$customDate}</td>
-	  {else}
-	  <td class="view-value">{$form.$customDate.html|crmDate}</td>
-	  {/if}
-	</tr>
-	{/if}
       </table>
       {if array_key_exists('custom', $activity_fields)}
         {include file="CRM/Mobilise/Override/CustomData.tpl"} 

@@ -138,7 +138,7 @@
   {/foreach}
 </table>
 
-<legend>Governer</legend>
+<legend>Governor</legend>
 <table class="display">
   <thead>
     <tr id="options" class="columnheader">
@@ -151,7 +151,7 @@
     </tr>
   </thead>
   {foreach from=$rows item=row}
-    {if $row.mobilisation eq 'Governer'}
+    {if $row.mobilisation eq 'Governor'}
       <tr id="row_{$row.id}" class="{cycle values="odd-row,even-row"}">
 	<td >{$row.date|crmDate}</td>
 	<td >{$row.amount}</td>

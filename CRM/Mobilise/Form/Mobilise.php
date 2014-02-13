@@ -113,7 +113,7 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
           'activity_date',
           'activity_end_date' => 'To Date',
           'notes',
-          'custom' => array(), // end date is still custom, so we keep custom keyword
+          'custom' => array('To Date'), // end date is still custom, so we keep custom keyword
         ),
       ),
       'Non Careers' => array( 

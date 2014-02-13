@@ -69,7 +69,9 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
    */
   public function setDefaultValues() {
     $defaults = array();
-
+    if ($this->_id) {
+      $defaults = CRM_Custom_Form_CustomData::setDefaultValues($this);
+    }
     list($defaults['activity_date_time'], $defaults['activity_date_time_time']) = 
       CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
     if ($this->_id) {
@@ -108,7 +110,7 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
     if (array_key_exists('custom', $this->_metadata[$this->_mtype]['activity_fields'])) {
       $this->set('type', 'Activity');
       $this->set('subType',  $this->_activityTypeId);
-      $this->set('entityId', $this->_id);
+      $this->set('entityID', $this->_id);
       $this->set('cgcount',  1);
       CRM_Custom_Form_CustomData::preProcess($this);
       foreach ($this->_groupTree as $gID => &$grpVals) {
@@ -120,21 +122,12 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
           }
           if (array_key_exists('activity_end_date', $this->_metadata[$this->_mtype]['activity_fields'])) {
             if ($fldVals['label'] == $this->_metadata[$this->_mtype]['activity_fields']['activity_end_date']) {
-              $dateCustomFieldID = $fID;
-              $dateCustomFieldLabel = $fldVals['label'];
+              $this->_dateCustomFieldName = $fldVals['element_name'];
             } 
           }
         }
       }
       CRM_Custom_Form_CustomData::buildQuickForm($this);
-    }
-
-    // add custom end date if configured in meta data
-    if (array_key_exists('custom', $this->_metadata[$this->_mtype]['activity_fields']) &&
-      array_key_exists('activity_end_date', $this->_metadata[$this->_mtype]['activity_fields'])) {
-      $this->_dateCustomFieldName = "custom_{$dateCustomFieldID}_-1";
-      $this->assign('customDate', $this->_dateCustomFieldName);
-      $this->addDate($this->_dateCustomFieldName, $dateCustomFieldLabel, TRUE, array('formatType' => 'activityDate'));
     }
     parent::buildQuickForm();
 
