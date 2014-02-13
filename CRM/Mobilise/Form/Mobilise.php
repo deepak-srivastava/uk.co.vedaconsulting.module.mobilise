@@ -156,12 +156,31 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     //FIXME: make sure act id has a type which is among the mtypes
 
+    if ($this->_id) {
+      // if we know id, initialize all required vars so each step of mobilisation could execute on its own.
+      if (!$this->get('mtype')) {
+        // set what step:type does on its completion
+        $activityTypeID = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $this->_id, 'activity_type_id');
+        $activityTypes  = CRM_Core_PseudoConstant::activityType();
+        $this->set('mtype', $activityTypes[$activityTypeID]);
+      }
+      if (!$this->get('event_id')) {
+        // set what step:event does on its completion
+        $eventID = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $this->_id, 'source_record_id');
+        $this->set('event_id', $eventID);
+      }
+    }
+    $this->_mtype = $this->get('mtype');
+    if (!$this->_mtype) {
+      CRM_Core_Error::fatal(ts("Couldn't determine the mobilisation type. Something wrong with configurations."));
+    }
+
     $session = CRM_Core_Session::singleton();
+    $this->_currentUserId = $session->get('userID');
     if (!$this->_id) {
       //FIXME: report instance id is hardcoded
       $session->pushUserContext(CRM_Utils_System::url('civicrm/report/instance/41', 'force=1'));
     }
-    $this->_currentUserId = $session->get('userID');
 
     require_once 'CRM/Futurefirst/veda_FF_utils.php';
     $this->_schoolId = CRM_Futurefirst_veda_FF_utils::get_teacher_school_ID();
@@ -169,8 +188,6 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
       CRM_Core_Error::fatal(ts("Can't find the school contact."));
     }
     $this->assign('schoolId', $this->_schoolId);
-
-    $this->_mtype = $this->get('mtype');
   }
 
   function getMobilisationTypes($types = array()) {

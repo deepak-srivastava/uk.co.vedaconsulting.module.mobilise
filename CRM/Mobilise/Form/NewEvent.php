@@ -50,10 +50,9 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
   public function preProcess() {
     parent::preProcess();
 
-    $this->assign('event_fields', $this->_metadata[$this->_mtype]['event_fields']);
-
     $eventTypes = array_flip(CRM_Core_OptionGroup::values('event_type'));
     $this->_eventTypeId = CRM_Utils_Array::value($this->_metadata[$this->_mtype]['event_fields']['type'], $eventTypes);
+    $this->assign('event_fields', $this->_metadata[$this->_mtype]['event_fields']);
 
     if ($this->_id) {
       if (!$this->get('event_id')) {
@@ -213,7 +212,8 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
    * @return string
    */
   public function getTitle() {
-    return ts('New Event');
+    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    return $id ? ts('Update Event') : ts('New Event');
   }
 }
 

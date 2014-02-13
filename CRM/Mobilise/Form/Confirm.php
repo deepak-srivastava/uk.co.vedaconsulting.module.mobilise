@@ -81,7 +81,8 @@ class CRM_Mobilise_Form_Confirm extends CRM_Mobilise_Form_Mobilise {
     if ($this->controller->get('workflow')) {
       return ts('Status');
     } else {
-      return ts('In Progress..');
+      $id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+      return $id ? ts('Status') : ts('In Progress..');
     }
   }
 }

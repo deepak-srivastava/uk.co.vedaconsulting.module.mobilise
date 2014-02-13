@@ -34,29 +34,28 @@
  */
 
 /**
- * 
+ * State machine for managing different states of the Import process.
  *
  */
-class CRM_Mobilise_Form_Update_Event extends CRM_Mobilise_Form_NewEvent {
+class CRM_Mobilise_StateMachine_UpdateEvent extends CRM_Core_StateMachine {
 
   /**
-   * Function to set variables up before form is built
+   * class constructor
    *
-   * @return void
-   * @access public
+   * @param object  CRM_Mobilise_Controller
+   * @param int     $action
+   *
+   * @return object CRM_Mobilise_StateMachine
    */
-  public function preProcess() {
-    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
-    $eventID = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $id, 'source_record_id');
-    $activityTypeID = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $id, 'activity_type_id');
-    if (!$eventID) {
-      CRM_Core_Error::fatal(ts("Doesn't look like event mobilisation."));
-    }
-    $activityTypes = CRM_Core_PseudoConstant::activityType();
-    $this->set('mtype', $activityTypes[$activityTypeID]);
-    $this->set('event_id', $eventID);
+  function __construct($controller, $action = CRM_Core_Action::NONE) {
+    parent::__construct($controller, $action);
 
-    parent::preProcess();
+    $this->_pages = array(
+      'CRM_Mobilise_Form_NewEvent'    => NULL,
+      'CRM_Mobilise_Form_Participant' => NULL,
+      'CRM_Mobilise_Form_Confirm'     => NULL,
+    );
+    $this->addSequentialPages($this->_pages, $action);
   }
 }
 

@@ -20,8 +20,14 @@
   </item>
   <item>
     <path>civicrm/mobilise/update/event</path>
-    <page_callback>CRM_Mobilise_Form_Update_Event</page_callback>
-    <title>Update Event</title>
+    <page_callback>CRM_Mobilise_Controller_UpdateEvent</page_callback>
+    <title>Update Event Mobilisation</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/mobilise/update/participant</path>
+    <page_callback>CRM_Mobilise_Controller_UpdateParticipant</page_callback>
+    <title>Update Participant</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
 </menu>

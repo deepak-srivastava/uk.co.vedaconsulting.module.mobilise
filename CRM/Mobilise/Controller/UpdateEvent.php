@@ -1,4 +1,5 @@
-{*
+<?php
+/*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.2                                                |
  +--------------------------------------------------------------------+
@@ -22,7 +23,29 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*}
+*/
 
-{* re-use mob event tpl *}
-{include file="CRM/Mobilise/Form/NewEvent.tpl"}
+/**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2012
+ * $Id$
+ *
+ */
+class CRM_Mobilise_Controller_UpdateEvent extends CRM_Core_Controller {
+
+  /**
+   * class constructor
+   */
+  function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
+    parent::__construct($title, $modal, NULL, FALSE, TRUE);
+
+    $this->_stateMachine = new CRM_Mobilise_StateMachine_UpdateEvent($this, $action);
+
+    // create and instantiate the pages
+    $this->addPages($this->_stateMachine, $action);
+
+    $this->addActions();
+  }
+}
+
