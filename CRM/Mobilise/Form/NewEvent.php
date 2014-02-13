@@ -39,6 +39,8 @@
  */
 class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
 
+  protected $_eventID = NULL;
+ 
   /**
    * Function to set variables up before form is built
    *
@@ -52,6 +54,13 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
 
     $eventTypes = array_flip(CRM_Core_OptionGroup::values('event_type'));
     $this->_eventTypeId = CRM_Utils_Array::value($this->_metadata[$this->_mtype]['event_fields']['type'], $eventTypes);
+
+    if ($this->_id) {
+      if (!$this->get('event_id')) {
+        CRM_Core_Error::fatal(ts("Couldn't determine the Event."));
+      }
+      $this->_eventID = $this->get('event_id');
+    }
   }
 
   /**
@@ -65,12 +74,22 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
   function setDefaultValues() {
     $defaults = array();
 
-    list($defaults['start_date']) = 
-      CRM_Utils_Date::setDateDefaults(NULL, 'activityDate');
-    $defaults['is_active'] = 1;
-
-    if ($this->_eventTypeId) {
-      $defaults['event_type_id'] = $this->_eventTypeId;
+    if (isset($this->_id)) {
+      $defaults = CRM_Custom_Form_CustomData::setDefaultValues($this);
+      $params   = array('id' => $this->_eventID);
+      CRM_Event_BAO_Event::retrieve($params, $defaults);
+      list($defaults['start_date']) = 
+        CRM_Utils_Date::setDateDefaults($defaults['start_date'], 'activityDate');
+      if (!empty($defaults['end_date'])) {
+        list($defaults['end_date']) = 
+          CRM_Utils_Date::setDateDefaults($defaults['end_date'], 'activityDate');
+      }
+    } else {
+      list($defaults['start_date']) = 
+        CRM_Utils_Date::setDateDefaults(NULL, 'activityDate');
+      if ($this->_eventTypeId) {
+        $defaults['event_type_id'] = $this->_eventTypeId;
+      }
     }
     return $defaults;
   }
@@ -107,11 +126,15 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
       $this->set('type', 'Event');
       //FIXME: uncomment subType when we have event-type known
       $this->set('subType',  $this->_eventTypeId);
-      $this->set('entityId', NULL);
+      $this->set('entityID', $this->_eventID);
       $this->set('cgcount',  1);
       CRM_Custom_Form_CustomData::preProcess($this);
       foreach ($this->_groupTree as $gID => &$grpVals) {
         foreach ($grpVals['fields'] as $fID => &$fldVals) {
+          if ($fldVals['label'] == CRM_Mobilise_Form_Mobilise::SCHOOL_HOST_CUSTOM_FIELD_TITLE && 
+            $grpVals['title'] == CRM_Mobilise_Form_Mobilise::SCHOOL_CUSTOM_SET_TITLE) {
+              $this->_hostSchoolElement = $fldVals['element_name'];
+            }
           if (!in_array($fldVals['label'], $this->_metadata[$this->_mtype]['event_fields']['custom'])) {
             unset($grpVals['fields'][$fID]);
           }
@@ -156,30 +179,26 @@ class CRM_Mobilise_Form_NewEvent extends CRM_Mobilise_Form_Mobilise {
     $params = $this->controller->exportValues($this->_name);
 
     //format params
+    if ($this->_eventID) {
+      $params['id'] = $this->_eventID;
+    }
     $params['start_date'] = CRM_Utils_Date::processDate($params['start_date']);
     $params['end_date']   = CRM_Utils_Date::processDate(CRM_Utils_Array::value('end_date', $params), '235959', TRUE);
     $params['is_active']  = CRM_Utils_Array::value('is_active', $params, 1);
 
-    // custom handling
-    $customFields = CRM_Core_BAO_CustomField::getFields('Event', FALSE, FALSE,
-      CRM_Utils_Array::value('event_type_id', $params)
-    );
-    // set host school custom field value
-    foreach ($customFields as $cfID => $vals) {
-      if ($vals['label'] == CRM_Mobilise_Form_Mobilise::SCHOOL_HOST_CUSTOM_FIELD_TITLE && 
-        $vals['groupTitle'] == CRM_Mobilise_Form_Mobilise::SCHOOL_CUSTOM_SET_TITLE) {
-        // since this is ref field. This text is not going to be taken. Its required for consideration.
-        $params["custom_{$cfID}_-1"] = "sample text"; 
-        // its the following user id that will be considered as contact-ref-id
-        $params["custom_{$cfID}_-1_id"] = $this->_schoolId;
-      }
+    if ($this->_hostSchoolElement) {
+      $params["{$this->_hostSchoolElement}"] = "sample text"; 
+      // its the following user id that will be considered as contact-ref-id
+      $params["{$this->_hostSchoolElement}_id"] = $this->_schoolId;
+    } else {
+      CRM_Core_Error::fatal(ts("Couldn't determine the custom field to hold school contact."));
     }
+
     // format custom params
-    $entityID = NULL;
     $params['custom'] = 
       CRM_Core_BAO_CustomField::postProcess($params,
         $customFields,
-        $entityID,
+        $this->_eventID,
         'Event');
     // create event
     $event = CRM_Event_BAO_Event::create($params);

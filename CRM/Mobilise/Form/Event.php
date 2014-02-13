@@ -166,6 +166,7 @@ class CRM_Mobilise_Form_Event extends CRM_Mobilise_Form_Mobilise {
   public function postProcess() {
     if ($this->_id) {
       $this->set('event_id', $this->_eventID);
+      $this->controller->set('is_new_event', TRUE);
       return TRUE;
     }
     $buttonClicked = $this->controller->getButtonName();
