@@ -120,6 +120,15 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
     foreach ($this->_alumniRoleIDs as $roleID) {
       $defaults['role_id'][$roleID] = 1;
     }
+
+    foreach ($this->_participants as $pid => $pdetails) {
+      if (in_array($pdetails['contact_id'], $this->_targetContactIDs) && 
+        in_array($pdetails['participant_role_id'], $this->_studentRoleIDs)) {
+        $defaults['contact[1]'] = $pdetails['sort_name'];
+        $defaults['contact_select_id[1]'] = $pdetails['contact_id'];
+        break;
+      }
+    }
     return $defaults;
   }
 

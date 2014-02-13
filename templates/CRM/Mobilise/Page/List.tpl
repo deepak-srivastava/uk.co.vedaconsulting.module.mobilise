@@ -143,8 +143,6 @@
   <thead>
     <tr id="options" class="columnheader">
       <th >{ts}Date Given{/ts}</th>
-      <th >{ts}Amount{/ts}</th>
-      <th >{ts}Purpose{/ts}</th>
       <th >{ts}Alumni{/ts}</th>
       <th >{ts}Note{/ts}</th>
       <th ></th>
@@ -154,8 +152,6 @@
     {if $row.mobilisation eq 'Governor'}
       <tr id="row_{$row.id}" class="{cycle values="odd-row,even-row"}">
 	<td >{$row.date|crmDate}</td>
-	<td >{$row.amount}</td>
-	<td >{$row.purpose}</td>
 	<td >{$row.alumni}</td>
 	<td >{$row.notes}</td>
 	<td>{$row.action}</td>
