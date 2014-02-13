@@ -34,52 +34,29 @@
  */
 
 /**
- * Page for displaying list of mobilisations 
+ * 
+ *
  */
-class CRM_Mobilise_Page_List extends CRM_Core_Page {
+class CRM_Mobilise_Form_Update_Event extends CRM_Mobilise_Form_NewEvent {
 
   /**
-   * Get action Links
+   * Function to set variables up before form is built
    *
-   * @return array (reference) of action links
+   * @return void
+   * @access public
    */
-  function &links($type) {
-    $updateURL  = ($type == 'Event') ? 'civicrm/mobilise/update/event' : 'civicrm/mobilise';
-    $updateURLQ = ($type == 'Event') ? 'id=%%id%%&reset=1' : 'action=update&id=%%id%%&reset=1';
-    $links = array(
-      CRM_Core_Action::UPDATE =>
-      array(
-        'name' => ts('Edit'),
-        'url' => $updateURL,
-        'qs' => $updateURLQ,
-        'title' => ts('Edit Mobilisation'),
-      ),
-      CRM_Core_Action::DELETE =>
-      array(
-        'name' => ts('Delete'),
-        'url' => 'civicrm/mobilise/del',
-        'qs' => 'action=delete&id=%%id%%',
-        'title' => ts('Delete Mobilisation'),
-      ),
-    );
-    return $links;
-  }
-
-  function run() {
-    $session = CRM_Core_Session::singleton();
-    $session->pushUserContext(CRM_Utils_System::url('civicrm/mobilise/list', 'reset=1'));
-
-    $this->browse();
-    return parent::run();
-  }
-
-  function browse() {
-    $mob  = new CRM_Mobilise_Utils_Mobilisation();
-    $rows = $mob->getMobilisations();
-    foreach ($rows as $key => $value) {
-      $action = array_sum(array_keys($this->links($value['type'])));
-      $rows[$key]['action'] = CRM_Core_Action::formLink(self::links($value['type']), $action, array('id' => $value['id']));
+  public function preProcess() {
+    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+    $eventID = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $id, 'source_record_id');
+    $activityTypeID = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $id, 'activity_type_id');
+    if (!$eventID) {
+      CRM_Core_Error::fatal(ts("Doesn't look like event mobilisation."));
     }
-    $this->assign('rows', $rows);
+    $activityTypes = CRM_Core_PseudoConstant::activityType();
+    $this->set('mtype', $activityTypes[$activityTypeID]);
+    $this->set('event_id', $eventID);
+
+    parent::preProcess();
   }
 }
+

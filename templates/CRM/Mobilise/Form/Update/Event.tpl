@@ -1,5 +1,4 @@
-<?php
-/*
+{*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.2                                                |
  +--------------------------------------------------------------------+
@@ -23,63 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+*}
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2012
- * $Id$
- *
- */
-
-/**
- * Page for displaying list of mobilisations 
- */
-class CRM_Mobilise_Page_List extends CRM_Core_Page {
-
-  /**
-   * Get action Links
-   *
-   * @return array (reference) of action links
-   */
-  function &links($type) {
-    $updateURL  = ($type == 'Event') ? 'civicrm/mobilise/update/event' : 'civicrm/mobilise';
-    $updateURLQ = ($type == 'Event') ? 'id=%%id%%&reset=1' : 'action=update&id=%%id%%&reset=1';
-    $links = array(
-      CRM_Core_Action::UPDATE =>
-      array(
-        'name' => ts('Edit'),
-        'url' => $updateURL,
-        'qs' => $updateURLQ,
-        'title' => ts('Edit Mobilisation'),
-      ),
-      CRM_Core_Action::DELETE =>
-      array(
-        'name' => ts('Delete'),
-        'url' => 'civicrm/mobilise/del',
-        'qs' => 'action=delete&id=%%id%%',
-        'title' => ts('Delete Mobilisation'),
-      ),
-    );
-    return $links;
-  }
-
-  function run() {
-    $session = CRM_Core_Session::singleton();
-    $session->pushUserContext(CRM_Utils_System::url('civicrm/mobilise/list', 'reset=1'));
-
-    $this->browse();
-    return parent::run();
-  }
-
-  function browse() {
-    $mob  = new CRM_Mobilise_Utils_Mobilisation();
-    $rows = $mob->getMobilisations();
-    foreach ($rows as $key => $value) {
-      $action = array_sum(array_keys($this->links($value['type'])));
-      $rows[$key]['action'] = CRM_Core_Action::formLink(self::links($value['type']), $action, array('id' => $value['id']));
-    }
-    $this->assign('rows', $rows);
-  }
-}
+{* re-use mob event tpl *}
+{include file="CRM/Mobilise/Form/NewEvent.tpl"}

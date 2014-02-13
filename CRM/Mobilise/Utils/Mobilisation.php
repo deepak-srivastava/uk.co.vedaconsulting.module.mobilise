@@ -76,6 +76,7 @@ INNER JOIN civicrm_option_group cog                 ON cog.id = cov.option_group
       $mobilisations[$mob->mobID] = array();
       $mobilisations[$mob->mobID]['id']           = $mob->mobID;
       $mobilisations[$mob->mobID]['mobilisation'] = $mob->mobilisation;
+      $mobilisations[$mob->mobID]['type']         = $this->_metadata[$mob->mobilisation]['type'];
       $mobilisations[$mob->mobID]['event_id']     = $mob->event_id;
       $mobilisations[$mob->mobID]['title']        = $mob->title;
       $mobilisations[$mob->mobID]['date']         = $mob->date;

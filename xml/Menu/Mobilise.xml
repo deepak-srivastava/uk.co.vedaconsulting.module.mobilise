@@ -18,4 +18,10 @@
     <title>Mobilisations</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/mobilise/update/event</path>
+    <page_callback>CRM_Mobilise_Form_Update_Event</page_callback>
+    <title>Update Event</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>
