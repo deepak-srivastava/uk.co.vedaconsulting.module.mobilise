@@ -169,11 +169,11 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
         $eventID = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $this->_id, 'source_record_id');
         $this->set('event_id', $eventID);
       }
+      if (!$this->_mtype) {
+        CRM_Core_Error::fatal(ts("Couldn't determine the mobilisation type. Something wrong with configurations."));
+      }
     }
     $this->_mtype = $this->get('mtype');
-    if (!$this->_mtype) {
-      CRM_Core_Error::fatal(ts("Couldn't determine the mobilisation type. Something wrong with configurations."));
-    }
 
     $session = CRM_Core_Session::singleton();
     $this->_currentUserId = $session->get('userID');
