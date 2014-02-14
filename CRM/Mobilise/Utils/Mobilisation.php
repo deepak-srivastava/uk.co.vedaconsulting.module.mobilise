@@ -111,7 +111,7 @@ INNER JOIN civicrm_option_group cog                 ON cog.id = cov.option_group
     $targetContacts = CRM_Activity_BAO_ActivityTarget::retrieveTargetIdsByActivityId($activityID);
     if (!empty($targetContacts)) {
       $query = "
-        SELECT GROUP_CONCAT(DISTINCT sort_name ORDER BY sort_name ASC ) as alumni
+        SELECT GROUP_CONCAT(DISTINCT CONCAT(first_name, ' ', last_name) ORDER BY first_name ASC) as alumni
         FROM civicrm_contact cc
         WHERE cc.id IN (" . implode(", ", $targetContacts) . ")";
       return CRM_Core_DAO::singleValueQuery($query);
@@ -160,7 +160,7 @@ INNER JOIN civicrm_option_group cog                 ON cog.id = cov.option_group
         INNER JOIN civicrm_participant cp                   ON cat.target_contact_id = cp.contact_id AND ce.id = cp.event_id
         INNER JOIN civicrm_contact     cc                   ON cc.id = cp.contact_id
         WHERE cov.label IN ('" . implode("', '", $mobActivityTypes) . "') {$roleClause}
-        ORDER BY cc.sort_name ASC";
+        ORDER BY cc.first_name ASC";
       $dao  = CRM_Core_DAO::executeQuery($query);
       $eventAlumni[$cacheKey][$dao->mobID]['alumni'] = array();
       while ($dao->fetch()) {
