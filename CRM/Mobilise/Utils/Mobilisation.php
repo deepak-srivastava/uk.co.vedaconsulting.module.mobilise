@@ -109,12 +109,20 @@ INNER JOIN civicrm_option_group cog                 ON cog.id = cov.option_group
 
   function getActivityAlumni($activityID) {
     $targetContacts = CRM_Activity_BAO_ActivityTarget::retrieveTargetIdsByActivityId($activityID);
+    $aActivityAlumni = array();
     if (!empty($targetContacts)) {
       $query = "
-        SELECT GROUP_CONCAT(DISTINCT CONCAT(first_name, ' ', last_name) ORDER BY first_name ASC) as alumni
+        SELECT CONCAT(first_name, ' ', last_name) as alumni,
+        cc.id as cid
         FROM civicrm_contact cc
         WHERE cc.id IN (" . implode(", ", $targetContacts) . ")";
-      return CRM_Core_DAO::singleValueQuery($query);
+      $dao = CRM_Core_DAO::executeQuery($query);
+      while($dao->fetch()){
+        $url = CRM_Utils_System::url('school-dashboard/alumni/view', "reset=1&gid=14&id={$dao->cid}");
+        $aActivityAlumni['alumni'][] = sprintf("<a href='{$url}'>%s</a>", $dao->alumni);
+      }
+      return is_array($aActivityAlumni['alumni']) ? 
+      implode(', ', $aActivityAlumni['alumni']) : '';
     }
     return NULL;
   }

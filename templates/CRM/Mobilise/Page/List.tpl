@@ -25,7 +25,9 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is for listing mobilisations*}
-
+<a class="button" href="{crmURL p='school-dashboard'}">Go to Dashboard</a>
+<br />
+<br />
 {strip}
 {*include file="CRM/common/jsortable.tpl"*}
 <legend>Careers Events</legend>
@@ -207,7 +209,7 @@
     {/if}
   {/foreach}
 </table>
-
 {/strip}
+<a class="button" href="{crmURL p='school-dashboard'}">Go to Dashboard</a>
 
 
