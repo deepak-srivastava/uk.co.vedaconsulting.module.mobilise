@@ -47,39 +47,6 @@ class CRM_Mobilise_Form_Type extends CRM_Mobilise_Form_Mobilise {
    */
   public function preProcess() {
     parent::preProcess();
-
-    $cids = CRM_Utils_Array::value('cids', $_REQUEST);
-    if (empty($cids)) {
-      $cids = $this->get('cids');
-    } else {
-      $contactIds = array();
-      foreach ($cids as $cid) {
-        // sanitize & validate input
-        if (CRM_Utils_Type::validate($cid, 'Integer')) {
-          $contactIds[] = $cid;
-        }
-      }
-      $cids = $contactIds;
-      if (!empty($cids)) {
-        // fill cache if empty
-        CRM_Contact_BAO_Contact_Permission::cache($this->_currentUserId);
-        // check permission
-        $query = "
-          SELECT count(*)
-            FROM civicrm_acl_contact_cache
-           WHERE user_id = %1
-             AND contact_id IN (" .implode(",", $cids). ")";
-        $count = CRM_Core_DAO::singleValueQuery($query, array(1 => array($this->_currentUserId, 'Integer')));
-        if ($count <> count($cids)) {
-          CRM_Core_Error::statusBounce(ts("Permission Error: Non permissioned contact(s) / alumni selected."));
-        }
-        $this->set('cids', $cids);
-      }
-    }
-
-    if (!$this->_id && empty($cids)) {
-      CRM_Core_Error::statusBounce(ts("Could not find valid contact ids"));
-    }
   }
 
   /**

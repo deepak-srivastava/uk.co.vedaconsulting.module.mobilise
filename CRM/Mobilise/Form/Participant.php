@@ -39,6 +39,14 @@
  */
 class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
 
+    protected $_participantCID = NULL;
+
+    protected $_onlyStudentUpdate = FALSE;
+
+    protected $_studentSection    = FALSE;
+
+    protected $_participantSection = FALSE;
+
   /**
    * Function to set variables up before form is built
    *
@@ -47,6 +55,19 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
    */
   public function preProcess() {
     parent::preProcess();
+
+    if ($this->_id) {
+      $cids = $this->get('cids');
+      if (count($cids) == 1) {
+        $this->_participantCID = $cids[0];
+      } else {
+        $this->_onlyStudentUpdate = TRUE;
+      }
+    }
+    $this->_participantSection = $this->_onlyStudentUpdate ? FALSE : TRUE;
+    $this->_studentSection     = $this->_participantCID ? FALSE : TRUE;
+    $this->assign('participantSection', $this->_participantSection);
+    $this->assign('studentSection', $this->_studentSection);
 
     $this->assign('participant_fields', 
       $this->_metadata[$this->_mtype]['participant_fields']);
@@ -115,18 +136,45 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
    */
   public function setDefaultValues() {
     $defaults = array();
-
     $defaults['role_id'] = array();
-    foreach ($this->_alumniRoleIDs as $roleID) {
-      $defaults['role_id'][$roleID] = 1;
-    }
 
-    foreach ($this->_participants as $pid => $pdetails) {
-      if (in_array($pdetails['contact_id'], $this->_targetContactIDs) && 
-        in_array($pdetails['participant_role_id'], $this->_studentRoleIDs)) {
-        $defaults['contact[1]'] = $pdetails['sort_name'];
-        $defaults['contact_select_id[1]'] = $pdetails['contact_id'];
-        break;
+    if ($this->_id) {
+      if ($this->_participantCID) {
+        foreach ($this->_participants as $key => $pdetails) {
+          if ($pdetails['contact_id'] == $this->_participantCID && 
+            in_array($pdetails['contact_id'], $this->_targetContactIDs)) {
+              $pid = $key;
+              break;
+            }
+        }
+        if ($pid) {
+          $ids = array();
+          $params = array('id' => $pid);
+          CRM_Event_BAO_Participant::getValues($params, $defaults, $ids);
+          $sep = CRM_Core_DAO::VALUE_SEPARATOR;
+          if ($defaults[$pid]['role_id']) {
+            foreach (explode($sep, $defaults[$pid]['role_id']) as $k => $v) {
+              $defaults[$pid]["role_id[{$v}]"] = 1;
+            }
+            unset($defaults[$pid]['role_id']);
+          }
+          $defaults = $defaults[$pid];
+          unset($defaults[$pid]);
+        }
+      }
+      if ($this->_studentSection) {
+        foreach ($this->_participants as $pid => $pdetails) {
+          if (in_array($pdetails['contact_id'], $this->_targetContactIDs) && 
+            in_array($pdetails['participant_role_id'], $this->_studentRoleIDs)) {
+              $defaults['contact[1]'] = $pdetails['sort_name'];
+              $defaults['contact_select_id[1]'] = $pdetails['contact_id'];
+              break;
+            }
+        }
+      }
+    } else {
+      foreach ($this->_alumniRoleIDs as $roleID) {
+        $defaults['role_id'][$roleID] = 1;
       }
     }
     return $defaults;
@@ -139,31 +187,34 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
    * @access public
    */
   public function buildQuickForm() {
-    if (array_key_exists('role', $this->_metadata[$this->_mtype]['participant_fields'])) {
-      $roleTypes = array();
-      $roleids   = CRM_Event_PseudoConstant::participantRole();
-      foreach ($roleids as $rolekey => $rolevalue) {
-        $this->_roleTypes[] = 
-          $this->createElement('checkbox', $rolekey, NULL, $rolevalue);
-      }
-      $this->addGroup($this->_roleTypes, 'role_id', ts('Alumni Role'));
-      $this->addRule('role_id', ts('Role is required'), 'required');
-    }
-    if (in_array('status', $this->_metadata[$this->_mtype]['participant_fields'])) {
-      $status = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
-      foreach ($status as $id => $label) {
-        if (in_array(strtolower($label), 
-            array("pending from pay later", "pending from incomplete transaction", "pending in cart"))) {
-          unset($status[$id]);
+    if ($this->_participantSection) {
+      if (array_key_exists('role', $this->_metadata[$this->_mtype]['participant_fields'])) {
+        $roleTypes = array();
+        $roleids   = CRM_Event_PseudoConstant::participantRole();
+        foreach ($roleids as $rolekey => $rolevalue) {
+          $this->_roleTypes[] = 
+            $this->createElement('checkbox', $rolekey, NULL, $rolevalue);
         }
+        $this->addGroup($this->_roleTypes, 'role_id', ts('Alumni Role'));
+        $this->addRule('role_id', ts('Role is required'), 'required');
       }
-      $this->add('select', 'status_id', ts('Alumni Status'), 
+      if (in_array('status', $this->_metadata[$this->_mtype]['participant_fields'])) {
+        $status = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
+        foreach ($status as $id => $label) {
+          if (in_array(strtolower($label), 
+          array("pending from pay later", "pending from incomplete transaction", "pending in cart"))) {
+            unset($status[$id]);
+          }
+        }
+        $this->add('select', 'status_id', ts('Alumni Status'), 
         array('' => ts('- select -')) + $status, TRUE);
+      }
     }
-    if (array_key_exists('student_contact', $this->_metadata[$this->_mtype]['participant_fields'])) {
-      $this->add('text', "contact[1]", ts('Student Contact'), array('width' => '200px'), TRUE);
-      $this->addElement('hidden', "contact_select_id[1]");
-    }
+    if ($this->_studentSection && 
+      array_key_exists('student_contact', $this->_metadata[$this->_mtype]['participant_fields'])) {
+        $this->add('text', "contact[1]", ts('Student Contact'), array('width' => '200px'), TRUE);
+        $this->addElement('hidden', "contact_select_id[1]");
+      }
     parent::buildQuickForm();
   }
 
@@ -230,11 +281,11 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
         'is_current_revision' => 0 ); // setting rev to 0, makes activity hidden on display 
       $activity = CRM_Activity_BAO_Activity::create($params);
     } else {
-      // update action 
+      // UPDATE Action
       $isStudentContactUpdated = FALSE;
       foreach ($this->_participants as $pid => $pdetails) {
         if (in_array($pdetails['contact_id'], $this->_targetContactIDs)) {
-          if (!in_array($pdetails['participant_role_id'], $this->_studentRoleIDs)) {
+          if ($pdetails['contact_id'] == $this->_participantCID) {
             $params = 
               array( 
                 'id'          => $pdetails['participant_id'],
@@ -249,23 +300,23 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
           } else if (!$isStudentContactUpdated && 
             !empty($values['contact_select_id'][1]) && 
             $pdetails['contact_id'] != $values['contact_select_id'][1]) {
-            // for new student role contact we drop & create a new participant
-            $params = 
-              array( 
-                'contact_id'  => $values['contact_select_id'][1],
-                'event_id'    => $this->get('event_id'),
-                'status_id'   => $values['status_id'],
-                'role_id'     => implode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_studentRoleIDs),
-                'register_date' => $now,
-                'version'       => 3,
-              );
-            $result = CRM_Event_BAO_Participant::create($params);
-            if ($result->id) {
-              CRM_Event_BAO_Participant::deleteParticipant($pdetails['participant_id']);
-              $isStudentContactUpdated = TRUE; // only handle once
-              CRM_Core_Error::debug_log_message("Alumni student role updated: pid={$result->id}, cid={$result->contact_id}");
+              // for new student role contact we drop & create a new participant
+              $params = 
+                array( 
+                  'contact_id'  => $values['contact_select_id'][1],
+                  'event_id'    => $this->get('event_id'),
+                  'status_id'   => $values['status_id'],
+                  'role_id'     => implode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_studentRoleIDs),
+                  'register_date' => $now,
+                  'version'       => 3,
+                );
+              $result = CRM_Event_BAO_Participant::create($params);
+              if ($result->id) {
+                CRM_Event_BAO_Participant::deleteParticipant($pdetails['participant_id']);
+                $isStudentContactUpdated = TRUE; // only handle once
+                CRM_Core_Error::debug_log_message("Alumni student role updated: pid={$result->id}, cid={$result->contact_id}");
+              }
             }
-          }
         }
       }
     }

@@ -163,18 +163,20 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
         $activityTypeID = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $this->_id, 'activity_type_id');
         $activityTypes  = CRM_Core_PseudoConstant::activityType();
         $this->set('mtype', $activityTypes[$activityTypeID]);
+        $this->set('activity_type_id', $activityTypeID);
       }
       if (!$this->get('event_id')) {
         // set what step:event does on its completion
         $eventID = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $this->_id, 'source_record_id');
         $this->set('event_id', $eventID);
       }
-      if (!$this->_mtype) {
+      if (!$this->get('mtype')) {
         CRM_Core_Error::fatal(ts("Couldn't determine the mobilisation type. Something wrong with configurations."));
       }
     }
     $this->_mtype = $this->get('mtype');
 
+    // logged in user
     $session = CRM_Core_Session::singleton();
     $this->_currentUserId = $session->get('userID');
     if (!$this->_id) {
@@ -182,12 +184,46 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
       $session->pushUserContext(CRM_Utils_System::url('civicrm/report/instance/41', 'force=1'));
     }
 
+    // school contact
     require_once 'CRM/Futurefirst/veda_FF_utils.php';
     $this->_schoolId = CRM_Futurefirst_veda_FF_utils::get_teacher_school_ID();
     if (!$this->_schoolId) {
       CRM_Core_Error::fatal(ts("Can't find the school contact."));
     }
     $this->assign('schoolId', $this->_schoolId);
+
+    // build contact list
+    $cids = CRM_Utils_Array::value('cids', $_REQUEST);
+    if (empty($cids)) {
+      $cids = $this->get('cids');
+    } else {
+      $contactIds = array();
+      foreach ($cids as $cid) {
+        // sanitize & validate input
+        if (CRM_Utils_Type::validate($cid, 'Integer')) {
+          $contactIds[] = $cid;
+        }
+      }
+      $cids = $contactIds;
+      if (!empty($cids)) {
+        // fill cache if empty
+        CRM_Contact_BAO_Contact_Permission::cache($this->_currentUserId);
+        // check permission
+        $query = "
+          SELECT count(*)
+            FROM civicrm_acl_contact_cache
+           WHERE user_id = %1
+             AND contact_id IN (" .implode(",", $cids). ")";
+        $count = CRM_Core_DAO::singleValueQuery($query, array(1 => array($this->_currentUserId, 'Integer')));
+        if ($count <> count($cids)) {
+          CRM_Core_Error::statusBounce(ts("Permission Error: Non permissioned contact(s) / alumni selected."));
+        }
+        $this->set('cids', $cids);
+      }
+    }
+    if (!$this->_id && empty($cids)) {
+      CRM_Core_Error::statusBounce(ts("Could not find valid contact ids"));
+    }
   }
 
   function getMobilisationTypes($types = array()) {

@@ -37,20 +37,29 @@
 
       <table class="form-layout-compressed">
 	{if $event}
-	<tr class="crm-mobilise-group-alumni-block-event"><td class="label">{ts}Event{/ts}</td><td>{$event}</td></tr>
+	  <tr class="crm-mobilise-group-alumni-block-event"><td class="label">{ts}Event{/ts}</td><td>{$event}</td></tr>
 	{/if}
-	{if array_key_exists('role', $participant_fields)}
-	<tr class="crm-mobilise-group-alumni-block-role_id"><td class="label">{$form.role_id.label}</td><td>{$form.role_id.html}</td></tr>
+	{if $participantSection}
+	  {assign var="sthToDisplay" value=1}
+	  {if array_key_exists('role', $participant_fields)}
+	    <tr class="crm-mobilise-group-alumni-block-role_id"><td class="label">{$form.role_id.label}</td><td>{$form.role_id.html}</td></tr>
+	  {/if}
+	  {if in_array('status', $participant_fields)}
+	    <tr class="crm-mobilise-group-alumni-block-status_id">
+	      <td class="label">{$form.status_id.label}</td><td>{$form.status_id.html}</td>
+	    </tr>
+	  {/if}
 	{/if}
-	{if in_array('status', $participant_fields)}
-	<tr class="crm-mobilise-group-alumni-block-status_id">
-	  <td class="label">{$form.status_id.label}</td><td>{$form.status_id.html}</td>
-	</tr>
-	{/if}
-	{if array_key_exists('student_contact', $participant_fields)}
-          {include file="CRM/Mobilise/Override/NewContact.tpl" blockNo=1}
+	{if $studentSection}
+	  {if array_key_exists('student_contact', $participant_fields)}
+	    {assign var="sthToDisplay" value=1}
+            {include file="CRM/Mobilise/Override/NewContact.tpl" blockNo=1}
+	  {/if}
 	{/if}
       </table>
+      {if !$sthToDisplay}
+        <div class="messages status">{ts}Nothing to update.{/ts}</div>
+      {/if}
 
     </div><!-- /.crm-accordion-body -->
   </div><!-- /.crm-accordion-wrapper -->
