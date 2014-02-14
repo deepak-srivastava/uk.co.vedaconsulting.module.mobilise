@@ -150,7 +150,7 @@ INNER JOIN civicrm_option_group cog                 ON cog.id = cov.option_group
 
       $query = "
         SELECT ca.id as mobID,
-        cc.sort_name as alumni,
+        CONCAT(cc.first_name, ' ', cc.last_name) as alumni,
         cc.id as cid
         FROM civicrm_activity ca
         INNER JOIN civicrm_activity_target cat              ON cat.activity_id = ca.id
@@ -160,21 +160,16 @@ INNER JOIN civicrm_option_group cog                 ON cog.id = cov.option_group
         INNER JOIN civicrm_participant cp                   ON cat.target_contact_id = cp.contact_id AND ce.id = cp.event_id
         INNER JOIN civicrm_contact     cc                   ON cc.id = cp.contact_id
         WHERE cov.label IN ('" . implode("', '", $mobActivityTypes) . "') {$roleClause}
-        GROUP BY ca.id, cc.sort_name, cc.id
-        ORDER BY cc.sort_name ASC
-        ";
-      $dao = CRM_Core_DAO::executeQuery($query);
-      $aAlumnis = array();
+        ORDER BY cc.sort_name ASC";
+      $dao  = CRM_Core_DAO::executeQuery($query);
+      $eventAlumni[$cacheKey][$dao->mobID]['alumni'] = array();
       while ($dao->fetch()) {
-     
-        $aAlumnis[$dao->mobID][] = sprintf( "<a href='civicrm/contact/view?reset=1&cid=%d'>%s</a>"
-                        , $dao->cid
-                        , $dao->alumni
-                        );
+        $url = CRM_Utils_System::url('school-dashboard/alumni/view', "reset=1&gid=14&id={$dao->cid}");
+        $eventAlumni[$cacheKey][$dao->mobID]['alumni'][] = sprintf("<a href='{$url}'>%s</a>", $dao->alumni);
       }
-      $eventAlumni[$cacheKey][$activityID]['alumni'] = implode(', ', $aAlumnis[$activityID]);
     }
-    return $eventAlumni[$cacheKey][$activityID]['alumni'];
+    return is_array($eventAlumni[$cacheKey][$activityID]['alumni']) ? 
+      implode(', ', $eventAlumni[$cacheKey][$activityID]['alumni']) : '';
   }
 
   function getCustomInfo($title) {
