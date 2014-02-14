@@ -45,7 +45,8 @@ class CRM_Mobilise_Form_Mobilise extends CRM_Core_Form {
     SCHOOL_SESSION_CUSTOM_FIELD_TITLE = 'Session Focus',
     ACTIVITY_CUSTOM_SET_TITLE           = 'Mobilisation Activity Data',
     ACTIVITY_AMOUNT_CUSTOM_FIELD_TITLE  = 'Amount',
-    ACTIVITY_PURPOSE_CUSTOM_FIELD_TITLE = 'Purpose';
+    ACTIVITY_PURPOSE_CUSTOM_FIELD_TITLE = 'Purpose',
+    ACTIVITY_TODATE_CUSTOM_FIELD_TITLE  = 'To Date';
   
   protected $_metadata = 
     array(

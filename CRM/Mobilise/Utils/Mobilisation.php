@@ -44,15 +44,35 @@ class CRM_Mobilise_Utils_Mobilisation {
     // initialize metadata
     $mob = new CRM_Mobilise_Form_Mobilise();
     $this->_metadata = $mob->getVar('_metadata');
+
+    require_once 'CRM/Futurefirst/veda_FF_utils.php';
+    $this->_schoolId = CRM_Futurefirst_veda_FF_utils::get_teacher_school_ID();
+    if (!$this->_schoolId) {
+      CRM_Core_Error::fatal(ts("Can't find the school contact."));
+    }
   }
 
-  function getMobilisations() {
+  function getMobilisations($contactID = NULL, $limit = NULL) {
     $mobilisations    = array();
     $mobActivityTypes = array_keys($this->_metadata);
 
     $eventCustomInfo    = $this->getCustomInfo(CRM_Mobilise_Form_Mobilise::SCHOOL_CUSTOM_SET_TITLE);
     $activityCustomInfo = $this->getCustomInfo(CRM_Mobilise_Form_Mobilise::ACTIVITY_CUSTOM_SET_TITLE);
 
+    $where   = array();
+    $where[] = "cov.label IN ('" . implode("', '", $mobActivityTypes) . "')";
+    $where[] = "ca.source_contact_id = %1";
+    $params  = array(1 => array($this->_schoolId, 'Integer'));
+    if ($contactID) {
+      $where[]   = "cat.target_contact_id = %2";
+      $params[2] = array($contactID, 'Integer');
+    }
+    $whereClause = "WHERE " . implode(" AND ", $where);
+
+    $limitCLause = "";
+    if ($limit) {
+      $limitCLause = "LIMIT " . (int)$limit;
+    }
     $query = "
     SELECT ca.id as mobID,
            cov.label as mobilisation,
@@ -63,15 +83,21 @@ class CRM_Mobilise_Utils_Mobilisation {
            ce.title,
            eventc.*,
            actc.*
-      FROM civicrm_activity ca
+      FROM civicrm_activity ca";
+    if ($contactID) {
+      $query .= "
+INNER JOIN civicrm_activity_target cat              ON cat.activity_id = ca.id";
+    }
+    $query .= "
 INNER JOIN civicrm_option_value cov                 ON ca.activity_type_id = cov.value
 INNER JOIN civicrm_option_group cog                 ON cog.id = cov.option_group_id AND cog.name = 'activity_type'
  LEFT JOIN civicrm_event ce                         ON ca.source_record_id = ce.id AND ce.is_active = 1
  LEFT JOIN {$eventCustomInfo['table_name']} eventc  ON ce.id = eventc.entity_id
  LEFT JOIN {$activityCustomInfo['table_name']} actc ON ca.id = actc.entity_id
-     WHERE cov.label IN ('" . implode("', '", $mobActivityTypes) . "')
-  ORDER BY ca.activity_date_time DESC";
-    $mob = CRM_Core_DAO::executeQuery($query);
+{$whereClause}
+ORDER BY ca.activity_date_time DESC
+{$limitCLause}";
+    $mob = CRM_Core_DAO::executeQuery($query, $params);
     while ($mob->fetch()) {
       $mobilisations[$mob->mobID] = array();
       $mobilisations[$mob->mobID]['id']           = $mob->mobID;
@@ -89,18 +115,24 @@ INNER JOIN civicrm_option_group cog                 ON cog.id = cov.option_group
           $mob->{$eventCustomInfo[CRM_Mobilise_Form_Mobilise::SCHOOL_SESSION_CUSTOM_FIELD_TITLE]['column_name']};
         $mobilisations[$mob->mobID]['notes'] = 
           $mob->{$eventCustomInfo[CRM_Mobilise_Form_Mobilise::SCHOOL_NOTE_CUSTOM_FIELD_TITLE]['column_name']};
-        $mobilisations[$mob->mobID]['alumni'] = 
-          $this->getEventAlumni($mob->mobID, $mob->mobilisation);
-        $mobilisations[$mob->mobID]['student'] = 
-          $this->getEventAlumni($mob->mobID, $mob->mobilisation, TRUE);
+        if (!$contactID) {
+          $mobilisations[$mob->mobID]['alumni'] = 
+            $this->getEventAlumni($mob->mobID, $mob->mobilisation);
+          $mobilisations[$mob->mobID]['student'] = 
+            $this->getEventAlumni($mob->mobID, $mob->mobilisation, TRUE);
+        }
       }
       if ($this->_metadata[$mob->mobilisation]['type'] == 'Activity') {
         $mobilisations[$mob->mobID]['amount']  = 
           $mob->{$activityCustomInfo[CRM_Mobilise_Form_Mobilise::ACTIVITY_AMOUNT_CUSTOM_FIELD_TITLE]['column_name']};
         $mobilisations[$mob->mobID]['purpose'] = 
           $mob->{$activityCustomInfo[CRM_Mobilise_Form_Mobilise::ACTIVITY_PURPOSE_CUSTOM_FIELD_TITLE]['column_name']};
-        $mobilisations[$mob->mobID]['alumni']  = 
-          $this->getActivityAlumni($mob->mobID);
+        $mobilisations[$mob->mobID]['end_date']  = 
+          $mob->{$activityCustomInfo[CRM_Mobilise_Form_Mobilise::ACTIVITY_TODATE_CUSTOM_FIELD_TITLE]['column_name']};
+        if (!$contactID) {
+          $mobilisations[$mob->mobID]['alumni']  = 
+            $this->getActivityAlumni($mob->mobID);
+        }
         $mobilisations[$mob->mobID]['notes']  = $mob->details;
       }
     }
