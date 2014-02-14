@@ -27,7 +27,7 @@
   <table class="form-layout">
     <tr>
       <td colspan="2">
-      <div class="status">{ts 1=$mType}Are you sure you want to delete this '%1' Mobilisation?{/ts}</div>
+      <div class="status">{$confirmMsg}</div>
       </td>
     </tr>
   </table>  

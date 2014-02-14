@@ -47,6 +47,7 @@ class CRM_Mobilise_Form_Delete extends CRM_Core_Form {
    */
   public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+    $this->_cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     $activityTypeID = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $this->_id, 'activity_type_id');
     $activityTypes  = CRM_Core_PseudoConstant::activityType();
 
@@ -59,7 +60,13 @@ class CRM_Mobilise_Form_Delete extends CRM_Core_Form {
     } else {
       CRM_Core_Error::statusBounce(ts("Doesn't look like a mobilisation."));
     }
-    $this->assign('mType', $mType);
+
+    if ($this->_cid) {
+      $confirmMsg = "Are you sure you want to delete this Participation?";
+    } else {
+      $confirmMsg = "Are you sure you want to delete this {$mType} Mobilisation?";
+    }
+    $this->assign('confirmMsg', $confirmMsg);
   }
 
   /**
@@ -94,16 +101,31 @@ class CRM_Mobilise_Form_Delete extends CRM_Core_Form {
         INNER JOIN civicrm_event ce                         ON ca.source_record_id = ce.id
         INNER JOIN civicrm_participant cp                   ON cat.target_contact_id = cp.contact_id AND ce.id = cp.event_id
              WHERE ca.id = %1";
-      $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($this->_id, 'Integer')));
+      $params = array(1 => array($this->_id, 'Integer'));
+
+      if ($this->_cid) {
+        $query .= " AND cp.contact_id = %2";
+        $params[2] = array($this->_cid, 'Integer');
+      }
+      $dao = CRM_Core_DAO::executeQuery($query, $params);
       while ($dao->fetch()) {
         CRM_Event_BAO_Participant::deleteParticipant($dao->id);
       }
     }
-    $activityParams = array('id' => $this->_id);
-    $result = CRM_Activity_BAO_Activity::deleteActivity($activityParams);
 
-    if ($result) {
-      CRM_Core_Session::setStatus("Mobilisation Deleted.");
+    if ($this->_cid) {
+      $target = new CRM_Activity_BAO_ActivityTarget();
+      $target->activity_id = $this->_id;
+      $target->target_contact_id = $this->_cid;
+      $result = $target->delete();
+      $status = ts("Participation Deleted.");
+    } else {
+      $activityParams = array('id' => $this->_id);
+      $result = CRM_Activity_BAO_Activity::deleteActivity($activityParams);
+      $status = ts("Mobilisation Deleted.");
+    }
+    if ($status) {
+      CRM_Core_Session::setStatus($status);
     }
   }
 }
