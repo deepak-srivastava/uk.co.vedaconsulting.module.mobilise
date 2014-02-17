@@ -315,6 +315,7 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
                 CRM_Event_BAO_Participant::deleteParticipant($pdetails['participant_id']);
                 $isStudentContactUpdated = TRUE; // only handle once
                 CRM_Core_Error::debug_log_message("Alumni student role updated: pid={$result->id}, cid={$result->contact_id}");
+                $count++;
               }
             }
         }
@@ -322,10 +323,10 @@ class CRM_Mobilise_Form_Participant extends CRM_Mobilise_Form_Mobilise {
     }
 
     if ($count > 0) {
-      $statusMsg = $this->_id ? ts('Mobilisation successfully updated.') : 
+      $statusMsg = $this->_id ? ts('Participation successfully updated.') : 
         ts('Mobilisation successfully created for the selected alumni.');
     } else {
-      $statusMsg = $this->_id ? ts('Could not update any mobilisations.') : 
+      $statusMsg = $this->_id ? ts('No participants were updated.') : 
         ts('Could not create any mobilisations.');
     }
     $this->set('status', $statusMsg);
