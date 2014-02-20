@@ -61,6 +61,12 @@ class CRM_Mobilise_Form_Delete extends CRM_Core_Form {
       CRM_Core_Error::statusBounce(ts("Doesn't look like a mobilisation."));
     }
 
+    // make sure logged in user has access to mobilisation
+    $mob = new CRM_Mobilise_Utils_Mobilisation();
+    if (!$mob->hasAccessToMobilisationID($this->_id)) {
+      CRM_Core_Error::statusBounce(ts("Not enough permission to alter this mobilisation / participation."));
+    }
+
     if ($this->_cid) {
       $confirmMsg = "Are you sure you want to delete this Participation?";
     } else {
@@ -93,23 +99,23 @@ class CRM_Mobilise_Form_Delete extends CRM_Core_Form {
   public function postProcess() {
     $sourceRecID = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $this->_id, 'source_record_id');
     if ($sourceRecID) {
-      // delete any participants that are part of mobilisation
-      $query = "
+      if (!$this->_cid) {
+        // delete event if it was a mobilisation delete
+        CRM_Event_BAO_Event::del($sourceRecID);
+      } else {
+        // delete any participants that are part of mobilisation
+        $query = "
             SELECT cp.id
               FROM civicrm_activity ca
         INNER JOIN civicrm_activity_target cat              ON cat.activity_id = ca.id
         INNER JOIN civicrm_event ce                         ON ca.source_record_id = ce.id
         INNER JOIN civicrm_participant cp                   ON cat.target_contact_id = cp.contact_id AND ce.id = cp.event_id
-             WHERE ca.id = %1";
-      $params = array(1 => array($this->_id, 'Integer'));
-
-      if ($this->_cid) {
-        $query .= " AND cp.contact_id = %2";
-        $params[2] = array($this->_cid, 'Integer');
-      }
-      $dao = CRM_Core_DAO::executeQuery($query, $params);
-      while ($dao->fetch()) {
-        CRM_Event_BAO_Participant::deleteParticipant($dao->id);
+             WHERE ca.id = %1 AND cp.contact_id = %2";
+        $params = array(1 => array($this->_id, 'Integer'), 2 => array($this->_cid, 'Integer'));
+        $dao    = CRM_Core_DAO::executeQuery($query, $params);
+        while ($dao->fetch()) {
+          CRM_Event_BAO_Participant::deleteParticipant($dao->id);
+        }
       }
     }
 

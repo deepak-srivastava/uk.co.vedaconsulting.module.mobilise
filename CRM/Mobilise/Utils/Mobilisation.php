@@ -52,7 +52,7 @@ class CRM_Mobilise_Utils_Mobilisation {
     }
   }
 
-  function getMobilisations($contactID = NULL, $limit = NULL) {
+  function getMobilisations($contactID = NULL, $limit = NULL, $isBuildAlumniList = TRUE) {
     $mobilisations    = array();
     $mobActivityTypes = array_keys($this->_metadata);
 
@@ -115,7 +115,7 @@ ORDER BY ca.activity_date_time DESC
           $mob->{$eventCustomInfo[CRM_Mobilise_Form_Mobilise::SCHOOL_SESSION_CUSTOM_FIELD_TITLE]['column_name']};
         $mobilisations[$mob->mobID]['notes'] = 
           $mob->{$eventCustomInfo[CRM_Mobilise_Form_Mobilise::SCHOOL_NOTE_CUSTOM_FIELD_TITLE]['column_name']};
-        if (!$contactID) {
+        if (!$contactID && $isBuildAlumniList) {
           $mobilisations[$mob->mobID]['alumni'] = 
             $this->getEventAlumni($mob->mobID, $mob->mobilisation);
           $mobilisations[$mob->mobID]['student'] = 
@@ -129,7 +129,7 @@ ORDER BY ca.activity_date_time DESC
           $mob->{$activityCustomInfo[CRM_Mobilise_Form_Mobilise::ACTIVITY_PURPOSE_CUSTOM_FIELD_TITLE]['column_name']};
         $mobilisations[$mob->mobID]['end_date']  = 
           $mob->{$activityCustomInfo[CRM_Mobilise_Form_Mobilise::ACTIVITY_TODATE_CUSTOM_FIELD_TITLE]['column_name']};
-        if (!$contactID) {
+        if (!$contactID && $isBuildAlumniList) {
           $mobilisations[$mob->mobID]['alumni']  = 
             $this->getActivityAlumni($mob->mobID);
         }
@@ -137,6 +137,13 @@ ORDER BY ca.activity_date_time DESC
       }
     }
     return $mobilisations;
+  }
+
+  function hasAccessToMobilisationID($mobID) {
+    if (!$mobID) return FALSE;
+
+    $mobilisations = $this->getMobilisations(NULL, NULL, FALSE);
+    return in_array($mobID, array_keys($mobilisations));
   }
 
   function getActivityAlumni($activityID) {
