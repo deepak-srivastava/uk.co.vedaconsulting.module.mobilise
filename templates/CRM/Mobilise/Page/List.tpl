@@ -102,7 +102,7 @@
   {foreach from=$rows item=row}
     {if $row.mobilisation eq 'Work Experience'}
       <tr id="row_{$row.id}" class="{cycle values="odd-row,even-row"}">
-	<td >{$row.date|truncate:10:''|crmDate}</td>
+	<td >{$row.date|truncate:10:''|crmDate}{if $row.end_date} - {$row.end_date|truncate:10:''|crmDate}{/if}</td>
 	<td >{$row.title}</td>
 	<td >{$row.student}</td>
 	<td >{$row.alumni}</td>
@@ -153,7 +153,7 @@
   {foreach from=$rows item=row}
     {if $row.mobilisation eq 'Governor'}
       <tr id="row_{$row.id}" class="{cycle values="odd-row,even-row"}">
-	<td >{$row.date|crmDate}</td>
+	<td >{$row.date|truncate:10:''|crmDate}{if $row.end_date} - {$row.end_date|truncate:10:''|crmDate}{/if}</td>
 	<td >{$row.alumni}</td>
 	<td >{$row.notes}</td>
 	<td>{$row.action}</td>
