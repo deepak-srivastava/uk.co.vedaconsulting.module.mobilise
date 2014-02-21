@@ -151,9 +151,11 @@ class CRM_Mobilise_Form_Target extends CRM_Mobilise_Form_Mobilise {
     $errors = array();
 
     $fromDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('activity_date_time', $fields));
-    $endDate  = CRM_Utils_Date::processDate(CRM_Utils_Array::value($self->_dateCustomFieldName, $fields));
-    if ($endDate < $fromDate) {
-      $errors[$self->_dateCustomFieldName] = ts("To date can't be earlier than the From Date.");
+    if ($endDate = CRM_Utils_Array::value($self->_dateCustomFieldName, $fields)) {
+      $endDate = CRM_Utils_Date::processDate($endDate);
+      if ($endDate < $fromDate) {
+        $errors[$self->_dateCustomFieldName] = ts("To date can't be earlier than the From Date.");
+      }
     }
 
     return $errors;
